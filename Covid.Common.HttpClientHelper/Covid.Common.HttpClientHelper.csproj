@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Covid.CommonUtils\Covid.CommonUtils.csproj" />
+    <ProjectReference Include="..\Covid.Common\Covid.Common.csproj" />
+    <ProjectReference Include="..\Covid.Web.Model\Covid.Web.Model.csproj" />
+  </ItemGroup>
+
+</Project>
