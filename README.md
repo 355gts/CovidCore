@@ -1,5 +1,10 @@
 # CovidCore
 
+# Software Requirements to run locally -
+
+1. Visual Studio 2017 - I used Community Edition v15.9.21 - https://visualstudio.microsoft.com/vs/older-downloads/
+2. RabbitMQ - https://www.rabbitmq.com/install-windows.html
+
 # Initial Config
 1. Covid.Api\appsettings.json 
 	- api requires access to a SqlServer db, the connection string needs inserting into this file
