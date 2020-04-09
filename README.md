@@ -54,3 +54,5 @@ RoutingKey: User
 
 5. To verify this has happened view the "User" queue in RabbitMq
 
+** repeated publishing of messages will continually trigger the logic below
+
