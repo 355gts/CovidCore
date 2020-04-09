@@ -3,7 +3,8 @@
 # Software Requirements to run locally -
 
 1. Visual Studio 2017 - I used Community Edition v15.9.21 - https://visualstudio.microsoft.com/vs/older-downloads/
-2. RabbitMQ - https://www.rabbitmq.com/install-windows.html
+2. .Net Core SDK 2.2.110-win-x64.exe - goto https://dotnet.microsoft.com/download/dotnet-core/2.2 search for 2.2.110 and download the Windows x64 version and install it after visual studio 
+3. RabbitMQ - https://www.rabbitmq.com/install-windows.html
 
 # Initial Config
 1. Covid.Api\appsettings.json 
