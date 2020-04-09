@@ -52,7 +52,7 @@ RoutingKey: User
 
 4. It then publishes a message similar to above but including the record id on to the "User" queue.
 
-5. To verify this has happened view the "User" queue in RabbitMq
+5. To verify this has happened view the "User" queue in RabbitMq, can also check the User table in the database
 
 ** repeated publishing of messages will continually trigger the logic below
 
