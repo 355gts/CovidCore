@@ -14,6 +14,9 @@
 
 # Database requirements
 
+If running in Visual Studio - go to View -> SQL Server Object Explorer.  There should be something like (localdb)\MSSQLLocalDb.....  
+Use this instance and put the connection string in the api config above
+
 Run the following script in the Sql Server -
 
 CREATE TABLE [dbo].[User] (
