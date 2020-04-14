@@ -25,35 +25,55 @@ namespace Covid.Service.Common
 
         private void LoadConfiguration()
         {
-            _logger.Info("Loading configuration.");
+            try
+            {
+                _logger.Info("Loading configuration.");
 
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
-            .AddEnvironmentVariables();
+                var currdirectory = Directory.GetCurrentDirectory();
 
-            Configuration = builder.Build();
+                _logger.Info($"Current working directory - '{currdirectory}'.");
 
-            _logger.Info("Configuration loaded.");
+                var builder = new ConfigurationBuilder()
+                .SetBasePath(currdirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+
+                Configuration = builder.Build();
+
+                _logger.Info("Configuration loaded.");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to load configuration, error details - {ex.Message}.", ex);
+            }
         }
 
         private void ConfigureLogging()
         {
-            if (!File.Exists(log4netFilename))
-                throw new FileNotFoundException($"Failed to find '{log4netFilename}' file.", log4netFilename);
+            try
+            {
+                _logger.Info($"Attempting to locate log4net config at location: '{log4netFilename}'.");
 
-            XmlDocument log4netConfig = new XmlDocument();
-            log4netConfig.Load(File.OpenRead(log4netFilename));
+                if (!File.Exists(log4netFilename))
+                    throw new FileNotFoundException($"Failed to find '{log4netFilename}' file.", log4netFilename);
 
-            var repo = LogManager.CreateRepository(
-                Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
+                XmlDocument log4netConfig = new XmlDocument();
+                log4netConfig.Load(File.OpenRead(log4netFilename));
 
-            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig[log4netName]);
+                var repo = LogManager.CreateRepository(
+                    Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
 
-            _logger.Info("Logging initialized.");
+                log4net.Config.XmlConfigurator.Configure(repo, log4netConfig[log4netName]);
+
+                _logger.Info("Logging initialized.");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to load log4net configuration, error details - {ex.Message}.", ex);
+            }
         }
     }
 }
