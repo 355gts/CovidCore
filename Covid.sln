@@ -21,9 +21,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Rabbit", "Covid.Rabbi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Message.Model", "Covid.Message.Model\Covid.Message.Model.csproj", "{9F5DE183-710D-48D9-B753-065D70276345}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.Common.HttpClientHelper", "Covid.Common.HttpClientHelper\Covid.Common.HttpClientHelper.csproj", "{FEA84BE4-B5B9-4C7A-895A-D9F16350D073}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Common.HttpClientHelper", "Covid.Common.HttpClientHelper\Covid.Common.HttpClientHelper.csproj", "{FEA84BE4-B5B9-4C7A-895A-D9F16350D073}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.CommonUtils", "Covid.CommonUtils\Covid.CommonUtils.csproj", "{BE8D31F8-DA92-473B-9EB9-14545754A4D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.CommonUtils", "Covid.CommonUtils\Covid.CommonUtils.csproj", "{BE8D31F8-DA92-473B-9EB9-14545754A4D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.Api.UnitTests", "Covid.Api.UnitTests\Covid.Api.UnitTests.csproj", "{2D93A938-55F3-409B-9811-5985A6E9D735}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.UserService.UnitTest", "Covid.UserService.UnitTest\Covid.UserService.UnitTest.csproj", "{6C5696E7-AE01-4399-AF89-D39C9B93D695}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,9 +81,21 @@ Global
 		{BE8D31F8-DA92-473B-9EB9-14545754A4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE8D31F8-DA92-473B-9EB9-14545754A4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE8D31F8-DA92-473B-9EB9-14545754A4D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D93A938-55F3-409B-9811-5985A6E9D735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D93A938-55F3-409B-9811-5985A6E9D735}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D93A938-55F3-409B-9811-5985A6E9D735}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D93A938-55F3-409B-9811-5985A6E9D735}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C5696E7-AE01-4399-AF89-D39C9B93D695}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C5696E7-AE01-4399-AF89-D39C9B93D695}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C5696E7-AE01-4399-AF89-D39C9B93D695}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C5696E7-AE01-4399-AF89-D39C9B93D695}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2D93A938-55F3-409B-9811-5985A6E9D735} = {C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}
+		{6C5696E7-AE01-4399-AF89-D39C9B93D695} = {C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2ECCA3A2-8FEF-4755-9F39-FF53D1C55F2F}

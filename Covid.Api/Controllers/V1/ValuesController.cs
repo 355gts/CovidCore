@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace Covid.Api.Controllers.V1
 {
+    //[Route("api/{version:apiVersion}/[controller]")]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : CovidControllerBase

@@ -13,6 +13,7 @@ namespace Covid.Api.Controllers.V2
     /// <summary>
     /// Instantiates an instance of the User controller
     /// </summary>
+    //[Route("api/{version:apiVersion}/users")]
     [Route("api/users")]
     [ApiController]
     public class UserController : CovidControllerBase
