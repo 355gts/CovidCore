@@ -3,7 +3,6 @@ using Covid.Rabbit.Configuration;
 using Covid.Rabbit.Connection;
 using Covid.Rabbit.Factories;
 using log4net;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System;
 using System.Text;
@@ -50,6 +49,7 @@ namespace Covid.Rabbit.Publisher
 
         public void Publish(T message, string routingKey = null)
         {
+            // TODO connection persistence, stop lots of connections
             try
             {
                 if (!_connected)
