@@ -22,7 +22,7 @@ namespace Covid.Rabbit.Factories
             _connections = new ConcurrentDictionary<string, IConnectionHandler>();
             _connectionFactory = new ConnectionFactory()
             {
-                HostName = _queueConfiguration.Hostname,
+                //HostName = _queueConfiguration.Hostname,
                 UserName = _queueConfiguration.Username,
                 Password = _queueConfiguration.Password,
                 // connection that will recover automatically
@@ -34,7 +34,7 @@ namespace Covid.Rabbit.Factories
                 RequestedConnectionTimeout = _queueConfiguration.RequestedConnectionTimeoutSeconds,
                 RequestedHeartbeat = _queueConfiguration.RequestedHeartbeatSeconds,
                 Ssl = new SslOption(_queueConfiguration.Hostname, _queueConfiguration.CertificatePath, _queueConfiguration.CertificatePath != null),
-                //Uri = !string.IsNullOrEmpty(_queueConfiguration.Uri) ? new Uri(_queueConfiguration.Uri) : null,
+                Uri = !string.IsNullOrEmpty(_queueConfiguration.Uri) ? new Uri(_queueConfiguration.Uri) : null,
                 Port = _queueConfiguration.Port.HasValue ? _queueConfiguration.Port.Value : AmqpTcpEndpoint.UseDefaultPort,
             };
         }
