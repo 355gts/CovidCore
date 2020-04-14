@@ -22,7 +22,7 @@ namespace Covid.Rabbit.Factories
             _connections = new ConcurrentDictionary<string, IConnectionHandler>();
             _connectionFactory = new ConnectionFactory()
             {
-                //HostName = _queueConfiguration.Hostname,
+                HostName = _queueConfiguration.Hostname,
                 UserName = _queueConfiguration.Username,
                 Password = _queueConfiguration.Password,
                 // connection that will recover automatically
@@ -31,7 +31,7 @@ namespace Covid.Rabbit.Factories
                 NetworkRecoveryInterval = TimeSpan.FromSeconds(_queueConfiguration.NetworkRecoveryIntervalSeconds),
                 ContinuationTimeout = TimeSpan.FromSeconds(_queueConfiguration.ContinuationTimeoutSeconds),
                 HandshakeContinuationTimeout = TimeSpan.FromSeconds(_queueConfiguration.HandshakeContinuationTimeoutSeconds),
-                RequestedConnectionTimeout = _queueConfiguration.RequestedConnectionTimeoutSeconds,
+                RequestedConnectionTimeout = _queueConfiguration.RequestedConnectionTimeoutSeconds * 60,
                 RequestedHeartbeat = _queueConfiguration.RequestedHeartbeatSeconds,
                 Ssl = new SslOption(_queueConfiguration.Hostname, _queueConfiguration.CertificatePath, _queueConfiguration.CertificatePath != null),
                 Uri = !string.IsNullOrEmpty(_queueConfiguration.Uri) ? new Uri(_queueConfiguration.Uri) : null,
