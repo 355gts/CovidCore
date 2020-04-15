@@ -18,7 +18,6 @@
     <ProjectReference Include="..\..\Covid.Message.Model\Covid.Message.Model.csproj" />
     <ProjectReference Include="..\..\Covid.Rabbit\Covid.Rabbit.csproj" />
     <ProjectReference Include="..\..\Covid.Service.Common\Covid.Service.Common.csproj" />
-    <ProjectReference Include="..\..\Covid.UserService\Covid.UserService.csproj" />
     <ProjectReference Include="..\..\Covid.Web.Model\Covid.Web.Model.csproj" />
     <ProjectReference Include="..\Covid.$ext_safeprojectname$\Covid.$ext_safeprojectname$.csproj" />
   </ItemGroup>
