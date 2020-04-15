@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Simon Blackmore",
+  "classifications": [ "Console", "C#", "windows", "linux" ], 
+  "name": "Covid Service Template",
+  "identity": "Covid.Service",         
+  "groupIdentity":"Covid",
+  "shortName": "covidService",
+  "tags": {
+    "language": "C#",
+    "type":"project"
+  },
+  "sourceName": "Covid.Service",
+  "preferNameDirectory": true,
+  "symbols":{
+    "includetest": {
+        "type": "parameter",
+        "datatype": "bool",
+        "defaultValue": "true"
+    }
+  },
+  "sources":[{
+    "modifiers": [{
+      "condition": "(!includetest)",
+      "exclude": [ "Covid.Service.UnitTest/**/*"]
+      }
+    ]
+  }]
+}
