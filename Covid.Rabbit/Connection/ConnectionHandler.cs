@@ -13,12 +13,14 @@ namespace Covid.Rabbit.Connection
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(ConnectionHandler));
         private bool isDisposed;
+        private readonly string _connectionName;
         private IConnection _connection;
         private readonly CancellationToken _cancellationToken;
         private readonly bool _autoRecoveryEnabled;
 
-        public ConnectionHandler(IConnection connection, CancellationToken cancellationToken, bool autoRecoveryEnabled)
+        public ConnectionHandler(string connectionName, IConnection connection, CancellationToken cancellationToken, bool autoRecoveryEnabled)
         {
+            _connectionName = connectionName ?? throw new ArgumentNullException(nameof(connectionName));
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
             if (cancellationToken == null)
@@ -53,12 +55,12 @@ namespace Covid.Rabbit.Connection
                 return;
             }
 
-            _logger.Warn($"Received ModelShutdown event from initiator '{e.Initiator.ToString()}.");
+            _logger.Warn($"Received ModelShutdown event from initiator '{e.Initiator.ToString()}'.");
         }
 
         private void OnConnectionRecoveryError(object sender, ConnectionRecoveryErrorEventArgs e)
         {
-            _logger.Error($"A unexpected exception occurred attempting to recover connection to Rabbit, error details - '{e.Exception.Message}'.", e.Exception);
+            _logger.Warn($"Failed to auto recover connection to Rabbit, re-attempting.....");
         }
 
         private void OnConnectionBlocked(object sender, ConnectionBlockedEventArgs e)

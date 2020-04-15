@@ -11,17 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\Covid.Common\log4net.config" Link="log4net.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="appsettings.Production.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="..\..\Covid.Common\log4net.config" Link="log4net.config" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
+    <Content Include="appsettings.Production.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
+    <Content Include="appsettings.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
   </ItemGroup>
 
   <ItemGroup>

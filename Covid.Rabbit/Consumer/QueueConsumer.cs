@@ -5,9 +5,9 @@ using Covid.Rabbit.Enumerations;
 using Covid.Rabbit.Factories;
 using Covid.Rabbit.Properties;
 using log4net;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Text;
 using System.Threading;
@@ -21,6 +21,7 @@ namespace Covid.Rabbit.Consumer
         private readonly IQueueConnectionFactory _connectionFactory;
         private readonly IJsonSerializer _serializer;
         private readonly string _consumerName;
+        private readonly IQueueConfiguration _queueConfiguration;
         private readonly IQueueConfig _queueConfig;
         private readonly CancellationToken _cancellationToken;
         private bool _connected;
@@ -36,15 +37,13 @@ namespace Covid.Rabbit.Consumer
                              string consumerName,
                               CancellationToken cancellationToken)
         {
-            if (queueConfiguration == null)
-                throw new ArgumentNullException(nameof(queueConfiguration));
-
-            if (cancellationToken == null)
-                throw new ArgumentNullException(nameof(cancellationToken));
-
+            _queueConfiguration = queueConfiguration ?? throw new ArgumentNullException(nameof(queueConfiguration));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _consumerName = consumerName ?? throw new ArgumentNullException(nameof(consumerName));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+
+            if (cancellationToken == null)
+                throw new ArgumentNullException(nameof(cancellationToken));
 
             _cancellationToken = cancellationToken;
 
@@ -65,6 +64,7 @@ namespace Covid.Rabbit.Consumer
                     _connection = _connectionFactory.CreateConnection(_queueConfig.Name, _cancellationToken);
 
                     _channel = _connection.CreateModel();
+                    _channel.BasicQos(0, _queueConfiguration.MaxPrefetchSize, false);
 
                     var consumer = new EventingBasicConsumer(_channel);
                     consumer.Received += async (model, ea) =>
@@ -85,6 +85,10 @@ namespace Covid.Rabbit.Consumer
                             await onMessage(message, deliveryTag, routingKey);
 
                             _channel.BasicAck(deliveryTag, false);
+                        }
+                        catch (AlreadyClosedException ex)
+                        {
+                            _logger.Warn($"The connection to Rabbit was closed while processing message with deliveryTag '{deliveryTag}', error details - '{ex.Message}'.");
                         }
                         catch (Exception ex)
                         {

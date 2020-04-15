@@ -42,6 +42,10 @@ namespace Covid.Rabbit.Configuration
         public bool AutomaticRecoveryEnabled { get; set; }
 
         [DataMember(IsRequired = true)]
+        [JsonProperty("maxPrefetchSize")]
+        public ushort MaxPrefetchSize { get; set; }
+
+        [DataMember(IsRequired = true)]
         [JsonProperty("networkRecoveryIntervalSeconds")]
         public int NetworkRecoveryIntervalSeconds { get; set; }
 

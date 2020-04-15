@@ -11,9 +11,9 @@
     <DocumentationFile>bin\$(Configuration)\Covid.Api.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\..\Covid.Common\log4net.config" Link="log4net.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="..\..\Covid.Common\log4net.config" Link="log4net.config" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
+    <Content Update="appsettings.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
+    <Content Update="appsettings.Production.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -43,15 +43,6 @@
     <Compile Update="Program.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="appsettings.Production.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

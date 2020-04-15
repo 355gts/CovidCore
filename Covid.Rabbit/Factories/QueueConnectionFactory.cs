@@ -16,6 +16,7 @@ namespace Covid.Rabbit.Factories
         private readonly IConnectionFactory _connectionFactory;
         private readonly object _lock = new object();
 
+
         public QueueConnectionFactory(IQueueConfiguration queueConfiguration)
         {
             _queueConfiguration = queueConfiguration ?? throw new ArgumentNullException(nameof(QueueConnectionFactory));
@@ -44,7 +45,11 @@ namespace Covid.Rabbit.Factories
             lock (_lock)
             {
                 if (!_connections.ContainsKey(connectionName))
-                    _connections.TryAdd(connectionName, new ConnectionHandler(_connectionFactory.CreateConnection(), cancellationToken, _queueConfiguration.AutomaticRecoveryEnabled));
+                {
+                    var _connectionHandler = new ConnectionHandler(connectionName, _connectionFactory.CreateConnection(), cancellationToken, _queueConfiguration.AutomaticRecoveryEnabled);
+
+                    _connections.TryAdd(connectionName, _connectionHandler);
+                }
 
                 return _connections[connectionName];
             }

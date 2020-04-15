@@ -18,6 +18,8 @@ namespace Covid.Rabbit.Configuration
 
         bool AutomaticRecoveryEnabled { get; set; }
 
+        ushort MaxPrefetchSize { get; set; }
+
         int NetworkRecoveryIntervalSeconds { get; set; }
 
         int ContinuationTimeoutSeconds { get; set; }
