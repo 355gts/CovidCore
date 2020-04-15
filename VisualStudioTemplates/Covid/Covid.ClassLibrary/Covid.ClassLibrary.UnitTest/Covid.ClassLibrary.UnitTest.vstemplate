@@ -1,0 +1,22 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Covid.ClassLibrary.UnitTest</Name>
+    <Description>Test project for Covid Class Library</Description>
+    <ProjectType>CSharp</ProjectType>
+	<LanguageTag>C#</LanguageTag>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>Covid.ClassLibrary.UnitTest</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+        <Hidden>true</Hidden>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="$ext_safeprojectname$.UnitTest.csproj" File="Covid.ClassLibrary.UnitTest.csproj" ReplaceParameters="true"/>
+  </TemplateContent>
+</VSTemplate>

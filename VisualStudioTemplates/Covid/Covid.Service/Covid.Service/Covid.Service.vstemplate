@@ -1,0 +1,43 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Covid.Service</Name>
+    <Description>Creates a new Service template</Description>
+    <ProjectType>CSharp</ProjectType>
+	<LanguageTag>C#</LanguageTag>
+	<PlatformTag>windows</PlatformTag>
+	<PlatformTag>linux</PlatformTag>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>Covid.Service</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+        <Hidden>true</Hidden>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="$ext_safeprojectname$.csproj" File="Covid.Service.csproj" ReplaceParameters="true">
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem ReplaceParameters="true" TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
+      </Folder>
+      <Folder Name="Container" TargetFolderName="Container">
+        <ProjectItem ReplaceParameters="true" TargetFileName="ContainerConfiguration.cs">ContainerConfiguration.cs</ProjectItem>
+      </Folder>
+      <Folder Name="EventListeners" TargetFolderName="EventListeners">
+        <ProjectItem ReplaceParameters="true" TargetFileName="ServiceEventListener.cs">ServiceEventListener.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Mappers" TargetFolderName="Mappers"/>
+      <Folder Name="Processors" TargetFolderName="Processors">
+        <ProjectItem ReplaceParameters="true" TargetFileName="IProcessor.cs">IProcessor.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Processor.cs">Processor.cs</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="appsettings.json">appsettings.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="appsettings.Production.json">appsettings.Production.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="$ext_safeprojectname$Service.cs">Service.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

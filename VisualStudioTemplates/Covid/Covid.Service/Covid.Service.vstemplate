@@ -1,0 +1,31 @@
+<VSTemplate Version="2.0.0" Type="ProjectGroup"
+    xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+    <TemplateData>
+        <Name>Covid Service Template</Name>
+        <Description>Creates the necessary projects for a Covid Service</Description>
+        <Icon>Icon.ico</Icon>
+    <ProjectType>CSharp</ProjectType>
+	<LanguageTag>C#</LanguageTag>
+	<PlatformTag>windows</PlatformTag>
+	<PlatformTag>linux</PlatformTag>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>Service</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+    </TemplateData>
+    <TemplateContent>
+        <ProjectCollection>
+                <ProjectTemplateLink ProjectName="Covid.$safeprojectname$" CopyParameters="true">
+                    Covid.Service\Covid.Service.vstemplate
+                </ProjectTemplateLink>
+            <SolutionFolder Name="Tests">
+                <ProjectTemplateLink ProjectName="Covid.$safeprojectname$.UnitTest" CopyParameters="true">
+                    Covid.Service.UnitTest\Covid.Service.UnitTest.vstemplate
+                </ProjectTemplateLink>
+            </SolutionFolder>
+        </ProjectCollection>
+    </TemplateContent>
+</VSTemplate>

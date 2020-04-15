@@ -1,0 +1,25 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Covid.Service.UnitTest</Name>
+    <Description>Test project for Covid Service</Description>
+    <ProjectType>CSharp</ProjectType>
+	<LanguageTag>C#</LanguageTag>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>Covid.Service.UnitTest</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+        <Hidden>true</Hidden>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="$ext_safeprojectname$.UnitTest.csproj" File="Covid.Service.UnitTest.csproj" ReplaceParameters="true">
+      <Folder Name="EventListeners" TargetFolderName="EventListeners" />
+      <Folder Name="Processors" TargetFolderName="Processors" />
+    </Project>
+  </TemplateContent>
+</VSTemplate>
