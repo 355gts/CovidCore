@@ -51,7 +51,11 @@ namespace Covid.UserService.EventListeners
 
             _logger.Info($"Successfully created user with id '{userId}', publishing message");
 
-            _messagePublisher.PublishUserMessage(_mapper.Map<Dom.User, User>(createdUserResult.Result));
+
+            for (int i = 0; i < 5; i++)
+            {
+                _messagePublisher.PublishUserMessage(_mapper.Map<Dom.User, User>(createdUserResult.Result));
+            }
         }
     }
 }

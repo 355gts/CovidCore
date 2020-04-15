@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -13,13 +13,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Covid.CommonUtils\Covid.CommonUtils.csproj" />
-    <ProjectReference Include="..\Covid.Common\Covid.Common.csproj" />
-    <ProjectReference Include="..\Covid.Message.Model\Covid.Message.Model.csproj" />
-    <ProjectReference Include="..\Covid.Rabbit\Covid.Rabbit.csproj" />
-    <ProjectReference Include="..\Covid.Service.Common\Covid.Service.Common.csproj" />
+    <ProjectReference Include="..\..\Covid.CommonUtils\Covid.CommonUtils.csproj" />
+    <ProjectReference Include="..\..\Covid.Common\Covid.Common.csproj" />
+    <ProjectReference Include="..\..\Covid.Message.Model\Covid.Message.Model.csproj" />
+    <ProjectReference Include="..\..\Covid.Rabbit\Covid.Rabbit.csproj" />
+    <ProjectReference Include="..\..\Covid.Service.Common\Covid.Service.Common.csproj" />
     <ProjectReference Include="..\Covid.UserService\Covid.UserService.csproj" />
-    <ProjectReference Include="..\Covid.Web.Model\Covid.Web.Model.csproj" />
+    <ProjectReference Include="..\..\Covid.Web.Model\Covid.Web.Model.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,7 +11,7 @@
     <DocumentationFile>bin\$(Configuration)\Covid.Api.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\Covid.Common\log4net.config" Link="log4net.config">
+    <Content Include="..\..\Covid.Common\log4net.config" Link="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -33,10 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Covid.Common\Covid.Common.csproj" />
-    <ProjectReference Include="..\Covid.Repository.Model\Covid.Repository.Model.csproj" />
-    <ProjectReference Include="..\Covid.Repository\Covid.Repository.csproj" />
-    <ProjectReference Include="..\Covid.Web.Model\Covid.Web.Model.csproj" />
+    <ProjectReference Include="..\..\Covid.Common\Covid.Common.csproj" />
+    <ProjectReference Include="..\..\Covid.Repository.Model\Covid.Repository.Model.csproj" />
+    <ProjectReference Include="..\..\Covid.Repository\Covid.Repository.csproj" />
+    <ProjectReference Include="..\..\Covid.Web.Model\Covid.Web.Model.csproj" />
   </ItemGroup>
 
   <ItemGroup>
