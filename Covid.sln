@@ -27,9 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.CommonUtils", "Covid.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.Api.UnitTests", "Covid.Api.UnitTests\Covid.Api.UnitTests.csproj", "{2D93A938-55F3-409B-9811-5985A6E9D735}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Api.UnitTests", "Covid.Api.UnitTests\Covid.Api.UnitTests.csproj", "{2D93A938-55F3-409B-9811-5985A6E9D735}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.UserService.UnitTest", "Covid.UserService.UnitTest\Covid.UserService.UnitTest.csproj", "{6C5696E7-AE01-4399-AF89-D39C9B93D695}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.UserService.UnitTest", "Covid.UserService.UnitTest\Covid.UserService.UnitTest.csproj", "{6C5696E7-AE01-4399-AF89-D39C9B93D695}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
