@@ -15,8 +15,9 @@ namespace Covid.Rabbit.Connection
         private bool isDisposed;
         private IConnection _connection;
         private readonly CancellationToken _cancellationToken;
+        private readonly bool _autoRecoveryEnabled;
 
-        public ConnectionHandler(IConnection connection, CancellationToken cancellationToken)
+        public ConnectionHandler(IConnection connection, CancellationToken cancellationToken, bool autoRecoveryEnabled)
         {
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
@@ -24,6 +25,8 @@ namespace Covid.Rabbit.Connection
                 throw new ArgumentNullException(nameof(cancellationToken));
 
             _cancellationToken = cancellationToken;
+            _autoRecoveryEnabled = autoRecoveryEnabled;
+
             _connection.CallbackException += OnCallbackException;
             _connection.ConnectionBlocked += OnConnectionBlocked;
             _connection.ConnectionRecoveryError += OnConnectionRecoveryError;
@@ -76,6 +79,12 @@ namespace Covid.Rabbit.Connection
                 if (args.Initiator == ShutdownInitiator.Application || _cancellationToken.IsCancellationRequested)
                 {
                     _logger.Info("Shutting down connection.");
+                    return;
+                }
+
+                if (!_autoRecoveryEnabled)
+                {
+                    _logger.Warn($"Auto recovery is not enabled, connection to Rabbit has been closed by '{args.Initiator.ToString()}'.");
                     return;
                 }
 

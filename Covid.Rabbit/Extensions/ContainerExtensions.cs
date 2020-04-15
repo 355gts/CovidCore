@@ -15,7 +15,8 @@ namespace Covid.Rabbit.Extensions
 
             containerBuilder.RegisterType<QueueConsumer<TMessageType>>()
                             .WithParameter("consumerName", consumerName)
-                            .WithParameter("cancellationToken", cancellationToken);
+                            .WithParameter("cancellationToken", cancellationToken)
+                            .SingleInstance();
 
             return containerBuilder;
         }
@@ -27,7 +28,8 @@ namespace Covid.Rabbit.Extensions
 
             containerBuilder.RegisterType<QueuePublisher<TMessageType>>()
                             .WithParameter("publisherName", publisherName)
-                            .WithParameter("cancellationToken", cancellationToken);
+                            .WithParameter("cancellationToken", cancellationToken)
+                            .SingleInstance();
 
             return containerBuilder;
         }

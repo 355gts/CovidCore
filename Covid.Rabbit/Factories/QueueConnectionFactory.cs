@@ -44,7 +44,7 @@ namespace Covid.Rabbit.Factories
             lock (_lock)
             {
                 if (!_connections.ContainsKey(connectionName))
-                    _connections.TryAdd(connectionName, new ConnectionHandler(_connectionFactory.CreateConnection(), cancellationToken));
+                    _connections.TryAdd(connectionName, new ConnectionHandler(_connectionFactory.CreateConnection(), cancellationToken, _queueConfiguration.AutomaticRecoveryEnabled));
 
                 return _connections[connectionName];
             }
