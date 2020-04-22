@@ -1,0 +1,46 @@
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "covid-pipeline"
+spec:
+  strategy:
+    jenkinsPipelineStrategy:
+      jenkinsfile: |-
+          def templatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/master/Deployment/covid-template.yaml'
+          def templateName = 'covid-template'
+          pipeline{
+            agent{
+              node{
+                label 'nodejs'
+              }
+            }
+            options{
+              timeout(time: 20, unit: 'MINUTES')
+            }
+            stages {
+                stage('preamble') {
+                    steps {
+                        script {
+                            openshift.withCluster() {
+                                openshift.withProject() {
+                                    echo "Using project: ${openshift.project()}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('create') {
+                    steps {
+                        script {
+                            openshift.withCluster() {
+                                openshift.withProject() {
+                                    openshift.newApp(templatePath) 
+                                }
+                            }
+                        }
+                    }
+                }
+             }
+          }
+    type: JenkinsPipeline
+    
