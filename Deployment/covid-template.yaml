@@ -7,59 +7,6 @@ labels:
   app: covid
 objects:
 - apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: covid-userservice-configmap
-    namespace: covid-test
-  data:
-    appsettings.json: |
-      {
-        "log4net": {
-          "ConfigFile": "log4net.config"
-        },
-        "queueConfiguration": {
-          "hostname": "ec2-3-8-181-169.eu-west-2.compute.amazonaws.com",
-          "username": "service",
-          "password": "Service123Service123",
-          "uri": "amqp://ec2-3-8-181-169.eu-west-2.compute.amazonaws.com:5672",
-          "automaticRecoveryEnabled": true,
-          "networkRecoveryIntervalSeconds": 10,
-          "continuationTimeoutSeconds": 10,
-          "handshakeContinuationTimeoutSeconds": 10,
-          "requestedConnectionTimeoutSeconds": 60,
-          "requestedHeartbeatSeconds": 60,
-          "consumers": [
-            {
-              "name": "NewUserQueueConsumer",
-              "queue": "CreateUser"
-            },
-            {
-              "name": "FirstTopicConsumer",
-              "exchange": "TopicExchange",
-              "routingKey": "MyFirstRoutingKey"
-            }
-          ],
-          "publishers": [
-            {
-              "name": "NewUserQueuePublisher",
-              "queue": "User",
-              "routingKey": "User",
-              "exchange": "User"
-            }
-          ]
-        },
-        "services": [
-          {
-            "name": "covid",
-            "rootUri": "http://covid-api:8080/"
-          },
-          {
-            "name": "another",
-            "rootUri": "https://another:api/"
-          }
-        ]
-      }
-- apiVersion: v1
   kind: Service
   metadata:
     labels:
@@ -225,3 +172,159 @@ objects:
       name: covid
       weight: 100
     wildcardPolicy: None  
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid-test
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: covid-api
+      deploymentconfig: covid-api
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: covid-api      
+    name: covid-api
+    namespace: covid-test
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: covid-api
+      deploymentconfig: covid-api
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: covid-api
+          deploymentconfig: covid-api
+      spec:
+        containers:
+        - image: image-registry.openshift-image-registry.svc:5000/covid-test/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
+          imagePullPolicy: Always
+          name: covid-api
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/app-root/app/appsettings.Production.json
+            name: covid-api-config
+            subPath: appsettings.Production.json
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: covid-api-config
+          name: covid-api-config
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - covid-api
+        from:
+          kind: ImageStreamTag
+          name: covid-api:latest
+          namespace: covid-test
+        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/covid-test/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
+      type: ImageChange
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid-test    
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: covid-api:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: https://github.com/355gts/CovidCore.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+        - name: DOTNET_STARTUP_PROJECT
+          value: Covid.Api/Covid.Api/Covid.Api.csproj
+        from:
+          kind: ImageStreamTag
+          name: dotnet:2.2
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: LNa7y5KwvC-aZvFBXZs9
+      type: GitHub
+    - generic:
+        secret: bnbTYUO_coJ-VqXHVHpe
+      type: Generic
+    - type: ConfigChange
+    - imageChange:
+        lastTriggeredImageID: image-registry.openshift-image-registry.svc:5000/openshift/dotnet@sha256:73237ba08fab93d93075551a95b9e0047e765b0285d98d2fbffb9bbd691c4512
+      type: ImageChange
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    generation: 1
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid-test
+  spec:
+    lookupPolicy:
+      local: false
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid-test
+  spec:
+    host: covid-api-covid-test.apps.ca-central-1.starter.openshift-online.com
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: covid-api
+      weight: 100
+    wildcardPolicy: None
