@@ -9,11 +9,7 @@ spec:
           def templatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/master/Deployment/covid-template.yaml'
           def templateName = 'covid-template'
           pipeline{
-            agent{
-              node{
-                label 'nodejs'
-              }
-            }
+            agent any
             options{
               timeout(time: 20, unit: 'MINUTES')
             }
@@ -28,19 +24,76 @@ spec:
                             }
                         }
                     }
-                }
+                }       
                 stage('create') {
                     steps {
                         script {
                             openshift.withCluster() {
                                 openshift.withProject() {
-                                    openshift.newApp(templatePath) 
+                                    openshift.newApp(templatePath, "--labels='test=true'") 
                                 }
                             }
                         }
                     }
                 }
-             }
+                stage('build') {
+                    steps {
+                        script {
+                            echo "Starting Build"
+                            openshift.withCluster() {
+                                openshift.withProject() {
+                                    echo "Getting build configs"
+                                    def buildConfigs = openshift.selector("bc", [test: "true", app: "covid"])
+                                    echo "Got build configs - ${buildConfigs.names()}"
+                                    buildConfigs.withEach {
+                                        def builds = openshift.selector(it.name()).related('builds')
+                                        builds.untilEach(1) {
+                                          echo "Checking ${it.name()} build status"
+                                          return (it.object().status.phase == "Complete")
+                                        }
+                                    }
+                                    echo "All builds complete"
+                                    
+                                }
+                            }
+                        } // script
+                    } // steps
+                } // stage
+                stage('deploy') {
+                    steps {
+                        script {
+                            openshift.withCluster() {
+                                openshift.withProject() {
+                                    echo "Getting deployment configs"
+                                    def deploymentConfigs = openshift.selector("dc", [test: "true", app: "covid"])
+                                    echo "Rolling out deployments - ${deploymentConfigs.names()}"
+                                    deploymentConfigs.withEach {
+                                        it.rollout()
+                                    }
+                                    deploymentConfigs.withEach {
+                                        it.related('pods').untilEach(1) {
+                                            echo "Waiting for pod ${it.name()} to deploy"
+                                            return (it.object().status.phase == "Running")  
+                                        }
+                                    }
+                                }
+                            }
+                        } // script
+                    } // steps
+                } // stage                
+            }
+            // post {
+            //     always{
+            //         // script {
+            //         //           openshift.withCluster() {
+            //         //               openshift.withProject() {
+            //         //                   // delete everything with this template label
+            //         //                   openshift.selector("all", [ test : true ]).delete()                                    
+            //         //               }
+            //         //           }
+            //         //       }
+            //     }
+            // }
           }
     type: JenkinsPipeline
     
