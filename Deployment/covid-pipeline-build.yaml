@@ -1,99 +1,63 @@
-kind: "BuildConfig"
-apiVersion: "v1"
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
 metadata:
-  name: "covid-pipeline"
+  name: covid-pipeline
+  namespace: covid-test
 spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: {}
+  output: {}
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    type: None
   strategy:
     jenkinsPipelineStrategy:
-      jenkinsfile: |-
-          def templatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/master/Deployment/covid-template.yaml'
-          def templateName = 'covid-template'
-          pipeline{
-            agent any
-            options{
-              timeout(time: 20, unit: 'MINUTES')
-            }
-            stages {
-                stage('preamble') {
-                    steps {
-                        script {
-                            openshift.withCluster() {
-                                openshift.withProject() {
-                                    echo "Using project: ${openshift.project()}"
-                                }
-                            }
-                        }
-                    }
-                }       
-                stage('create') {
-                    steps {
-                        script {
-                            openshift.withCluster() {
-                                openshift.withProject() {
-                                    openshift.newApp(templatePath, "--labels='test=true'") 
-                                }
-                            }
-                        }
-                    }
-                }
-                stage('build') {
-                    steps {
-                        script {
-                            echo "Starting Build"
-                            openshift.withCluster() {
-                                openshift.withProject() {
-                                    echo "Getting build configs"
-                                    def buildConfigs = openshift.selector("bc", [test: "true", app: "covid"])
-                                    echo "Got build configs - ${buildConfigs.names()}"
-                                    buildConfigs.withEach {
-                                        def builds = openshift.selector(it.name()).related('builds')
-                                        builds.untilEach(1) {
-                                          echo "Checking ${it.name()} build status"
-                                          return (it.object().status.phase == "Complete")
-                                        }
-                                    }
-                                    echo "All builds complete"
-                                    
-                                }
-                            }
-                        } // script
-                    } // steps
-                } // stage
-                stage('deploy') {
-                    steps {
-                        script {
-                            openshift.withCluster() {
-                                openshift.withProject() {
-                                    echo "Getting deployment configs"
-                                    def deploymentConfigs = openshift.selector("dc", [test: "true", app: "covid"])
-                                    echo "Rolling out deployments - ${deploymentConfigs.names()}"
-                                    deploymentConfigs.withEach {
-                                        it.rollout()
-                                    }
-                                    deploymentConfigs.withEach {
-                                        it.related('pods').untilEach(1) {
-                                            echo "Waiting for pod ${it.name()} to deploy"
-                                            return (it.object().status.phase == "Running")  
-                                        }
-                                    }
-                                }
-                            }
-                        } // script
-                    } // steps
-                } // stage                
-            }
-            // post {
-            //     always{
-            //         // script {
-            //         //           openshift.withCluster() {
-            //         //               openshift.withProject() {
-            //         //                   // delete everything with this template label
-            //         //                   openshift.selector("all", [ test : true ]).delete()                                    
-            //         //               }
-            //         //           }
-            //         //       }
-            //     }
-            // }
-          }
+      jenkinsfile: "def templatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/master/Deployment/covid-template.yaml'\ndef
+        templateName = 'covid-template'\npipeline{\n  agent any\n  options{\n    timeout(time:
+        20, unit: 'MINUTES')\n  }\n  stages {\n      stage('preamble') {\n          steps
+        {\n              script {\n                  openshift.withCluster() {\n                      openshift.withProject()
+        {\n                          echo \"Using project: ${openshift.project()}\"\n
+        \                     }\n                  }\n              }\n          }\n
+        \     }       \n      stage('create') {\n          steps {\n              script
+        {\n                  openshift.withCluster() {\n                      openshift.withProject()
+        {\n                          openshift.newApp(templatePath, \"--labels='test=true'\")
+        \n                      }\n                  }\n              }\n          }\n
+        \     }\n      stage('build') {\n          steps {\n              script {\n
+        \                 echo \"Starting Build\"\n                  openshift.withCluster()
+        {\n                      openshift.withProject() {\n                          echo
+        \"Getting build configs\"\n                          def buildConfigs = openshift.selector(\"bc\",
+        [test: \"true\", app: \"covid\"])\n                          echo \"Got build
+        configs - ${buildConfigs.names()}\"\n                          buildConfigs.withEach
+        {\n                              def builds = openshift.selector(it.name()).related('builds')\n
+        \                             builds.untilEach(1) {\n                                echo
+        \"Checking ${it.name()} build status\"\n                                return
+        (it.object().status.phase == \"Complete\")\n                              }\n
+        \                         }\n                          echo \"All builds complete\"\n
+        \                         \n                      }\n                  }\n
+        \             } // script\n          } // steps\n      } // stage\n      stage('deploy')
+        {\n          steps {\n              script {\n                  openshift.withCluster()
+        {\n                      openshift.withProject() {\n                          echo
+        \"Getting deployment configs\"\n                          def deploymentConfigs
+        = openshift.selector(\"dc\", [test: \"true\", app: \"covid\"])\n                          echo
+        \"Rolling out deployments - ${deploymentConfigs.names()}\"\n                          deploymentConfigs.withEach
+        {\n                              it.rollout()\n                          }\n
+        \                         deploymentConfigs.withEach {\n                              it.related('pods').untilEach(1)
+        {\n                                  echo \"Waiting for pod ${it.name()} to
+        deploy\"\n                                  return (it.object().status.phase
+        == \"Running\")  \n                              }\n                          }\n
+        \                     }\n                  }\n              } // script\n
+        \         } // steps\n      } // stage                \n  }\n  // post {\n
+        \ //     always{\n  //         // script {\n  //         //           openshift.withCluster()
+        {\n  //         //               openshift.withProject() {\n  //         //
+        \                  // delete everything with this template label\n  //         //
+        \                  openshift.selector(\"all\", [ test : true ]).delete()                                    \n
+        \ //         //               }\n  //         //           }\n  //         //
+        \      }\n  //     }\n  // }\n}"
     type: JenkinsPipeline
-    
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - github:
+      secret: lXgDq0_BH75lcCfrQ2_v
+    type: GitHub
