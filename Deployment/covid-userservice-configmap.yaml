@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: covid-userservice-configmap
+ namespace: covid
+data:
+ appsettings.json: |
+   {
+     "log4net": {
+       "ConfigFile": "log4net.config"
+     },
+     "queueConfiguration": {
+       "hostname": "ec2-3-8-181-169.eu-west-2.compute.amazonaws.com",
+       "username": "service",
+       "password": "Service123Service123",
+       "uri": "amqp://ec2-3-8-181-169.eu-west-2.compute.amazonaws.com:5672",
+       "automaticRecoveryEnabled": true,
+       "networkRecoveryIntervalSeconds": 10,
+       "continuationTimeoutSeconds": 10,
+       "handshakeContinuationTimeoutSeconds": 10,
+       "requestedConnectionTimeoutSeconds": 60,
+       "requestedHeartbeatSeconds": 60,
+       "consumers": [
+         {
+           "name": "NewUserQueueConsumer",
+           "queue": "CreateUser"
+         },
+         {
+           "name": "FirstTopicConsumer",
+           "exchange": "TopicExchange",
+           "routingKey": "MyFirstRoutingKey"
+         }
+       ],
+       "publishers": [
+         {
+           "name": "NewUserQueuePublisher",
+           "queue": "User",
+           "routingKey": "User",
+           "exchange": "User"
+         }
+       ]
+     },
+     "services": [
+       {
+         "name": "covid",
+         "rootUri": "http://covid-api:8080/"
+       },
+       {
+         "name": "another",
+         "rootUri": "https://another:api/"
+       }
+     ]
+   }

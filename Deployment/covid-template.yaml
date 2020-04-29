@@ -1,10 +1,19 @@
+apiVersion: template.openshift.io/v1
 kind: Template
-apiVersion: v1
-metadata:
-  name: covid-template
 labels:
-  template: covid-template
   app: covid
+  template: covid-template
+metadata:
+  annotations:
+    description: Creates a new instance of the Covid Application on Openshift
+    openshift.io/display-name: Covid
+    openshift.io/documentation-url: https://github.com/355gts/CovidCore
+    openshift.io/provider-display-name: Kieron Macknight
+    openshift.io/support-url: https://github.com/355gts/CovidCore
+    tags: covid
+  creationTimestamp: null
+  name: covid
+  selfLink: /apis/template.openshift.io/v1/namespaces/covid/templates/covid
 objects:
 - apiVersion: v1
   kind: Service
@@ -12,7 +21,7 @@ objects:
     labels:
       app: covid
     name: covid
-    namespace: covid-test
+    namespace: covid
   spec:
     ports:
     - name: 8080-tcp
@@ -30,12 +39,12 @@ objects:
   kind: DeploymentConfig
   metadata:
     annotations:
-      app.openshift.io/connects-to: covid-api      
+      app.openshift.io/connects-to: covid-api
     labels:
       app: covid
       app.kubernetes.io/part-of: covid
     name: covid
-    namespace: covid-test
+    namespace: covid
   spec:
     replicas: 1
     revisionHistoryLimit: 10
@@ -61,13 +70,17 @@ objects:
           deploymentconfig: covid
       spec:
         containers:
-        - image: image-registry.openshift-image-registry.svc:5000/covid-test/covid@sha256:db8f8ce23a4ab5fe89d5e67323d0aa097f4f2673580fd119a15228b593c455b8
+        - image: image-registry.openshift-image-registry.svc:5000/covid/covid@sha256:db8f8ce23a4ab5fe89d5e67323d0aa097f4f2673580fd119a15228b593c455b8
           imagePullPolicy: Always
           name: covid
           ports:
           - containerPort: 8080
             protocol: TCP
-          resources: {}
+          resources:
+            limits:
+              memory: 128Mi
+            requests:
+              memory: 64Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
@@ -94,16 +107,16 @@ objects:
         from:
           kind: ImageStreamTag
           name: covid:latest
-          namespace: covid-test
-        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/covid-test/covid@sha256:db8f8ce23a4ab5fe89d5e67323d0aa097f4f2673580fd119a15228b593c455b8
-      type: ImageChange  
+          namespace: covid
+        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/covid/covid@sha256:db8f8ce23a4ab5fe89d5e67323d0aa097f4f2673580fd119a15228b593c455b8
+      type: ImageChange
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
     labels:
       app: covid
     name: covid
-    namespace: covid-test
+    namespace: covid
   spec:
     failedBuildsHistoryLimit: 5
     nodeSelector: null
@@ -149,10 +162,10 @@ objects:
     labels:
       app: covid
     name: covid
-    namespace: covid-test
+    namespace: covid
   spec:
     lookupPolicy:
-      local: false  
+      local: false
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -161,24 +174,24 @@ objects:
     labels:
       app: covid
     name: covid
-    namespace: covid-test
-    selfLink: /apis/route.openshift.io/v1/namespaces/covid-test/routes/covid
+    namespace: covid
+    selfLink: /apis/route.openshift.io/v1/namespaces/covid/routes/covid
   spec:
-    host: covid-covid-test.apps.ca-central-1.starter.openshift-online.com
+    host: covid-covid.apps.ca-central-1.starter.openshift-online.com
     port:
       targetPort: 8080-tcp
     to:
       kind: Service
       name: covid
       weight: 100
-    wildcardPolicy: None  
+    wildcardPolicy: None
 - apiVersion: v1
   kind: Service
   metadata:
     labels:
       app: covid-api
     name: covid-api
-    namespace: covid-test
+    namespace: covid
   spec:
     ports:
     - name: 8080-tcp
@@ -196,9 +209,10 @@ objects:
   kind: DeploymentConfig
   metadata:
     labels:
-      app: covid-api      
+      app: covid
+      app.kubernetes.io/part-of: covid
     name: covid-api
-    namespace: covid-test
+    namespace: covid
   spec:
     replicas: 1
     revisionHistoryLimit: 10
@@ -222,7 +236,7 @@ objects:
           deploymentconfig: covid-api
       spec:
         containers:
-        - image: image-registry.openshift-image-registry.svc:5000/covid-test/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
+        - image: image-registry.openshift-image-registry.svc:5000/covid/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
           imagePullPolicy: Always
           name: covid-api
           ports:
@@ -233,7 +247,7 @@ objects:
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /opt/app-root/app/appsettings.Production.json
-            name: covid-api-config
+            name: covid-api-configmap
             subPath: appsettings.Production.json
         dnsPolicy: ClusterFirst
         restartPolicy: Always
@@ -243,8 +257,8 @@ objects:
         volumes:
         - configMap:
             defaultMode: 420
-            name: covid-api-config
-          name: covid-api-config
+            name: covid-api-configmap
+          name: covid-api-configmap
     test: false
     triggers:
     - type: ConfigChange
@@ -255,8 +269,8 @@ objects:
         from:
           kind: ImageStreamTag
           name: covid-api:latest
-          namespace: covid-test
-        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/covid-test/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
+          namespace: covid
+        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/covid/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
       type: ImageChange
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
@@ -264,7 +278,7 @@ objects:
     labels:
       app: covid-api
     name: covid-api
-    namespace: covid-test    
+    namespace: covid
   spec:
     failedBuildsHistoryLimit: 5
     nodeSelector: null
@@ -308,7 +322,7 @@ objects:
     labels:
       app: covid-api
     name: covid-api
-    namespace: covid-test
+    namespace: covid
   spec:
     lookupPolicy:
       local: false
@@ -318,9 +332,9 @@ objects:
     labels:
       app: covid-api
     name: covid-api
-    namespace: covid-test
+    namespace: covid
   spec:
-    host: covid-api-covid-test.apps.ca-central-1.starter.openshift-online.com
+    host: covid-api-covid.apps.ca-central-1.starter.openshift-online.com
     port:
       targetPort: 8080-tcp
     to:
