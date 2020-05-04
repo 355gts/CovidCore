@@ -27,7 +27,7 @@ namespace Covid.Api.Mappers.Users
             user.Firstname = fromObject.Firstname;
             user.Id = fromObject.Id;
             user.Surname = fromObject.Surname;
-            user.Message = "The code has been updated";
+            user.Message = "The code has been updated, and updated again";
 
             return user;
         }
