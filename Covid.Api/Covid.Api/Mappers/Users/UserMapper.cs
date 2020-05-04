@@ -26,7 +26,7 @@ namespace Covid.Api.Mappers.Users
             user.DateOfBirth = fromObject.DateOfBirth;
             user.Firstname = fromObject.Firstname;
             user.Id = fromObject.Id;
-            user.Surname = fromObject.Surname;
+            user.Surname = "This is an api update only";
             //user.Message = "The code has been updated, and updated again";
 
             return user;
