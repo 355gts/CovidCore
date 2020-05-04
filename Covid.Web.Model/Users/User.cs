@@ -10,5 +10,8 @@ namespace Covid.Web.Model.Users
         [DataMember(IsRequired = true)]
         [Range(0, Int64.MaxValue)]
         public long Id { get; set; }
+
+        [DataMember(IsRequired = false)]
+        public string Message { get; set; }
     }
 }
