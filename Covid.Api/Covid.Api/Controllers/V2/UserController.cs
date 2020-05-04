@@ -32,7 +32,7 @@ namespace Covid.Api.Controllers.V2
         public async Task<ActionResult<IEnumerable<User>>> GetUsersAsync()
         {
             var repoUsers = await _repositoryFacade.Users.GetUsersAsync();
-
+            // Test
             var users = _mapper.MapEnumerable<Repo.User, Dom.User>(repoUsers);
 
             return Ok(users);
