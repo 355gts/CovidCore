@@ -1,0 +1,344 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: covid
+  template: covid-template
+metadata:
+  annotations:
+    description: Creates a new instance of the Covid Application on Openshift
+    openshift.io/display-name: Covid
+    openshift.io/documentation-url: https://github.com/355gts/CovidCore
+    openshift.io/provider-display-name: Kieron Macknight
+    openshift.io/support-url: https://github.com/355gts/CovidCore
+    tags: covid
+  creationTimestamp: null
+  name: covid
+  selfLink: /apis/template.openshift.io/v1/namespaces/covid/templates/covid
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: covid
+    name: covid
+    namespace: covid
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: covid
+      deploymentconfig: covid
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      app.openshift.io/connects-to: covid-api
+    labels:
+      app: covid
+      app.kubernetes.io/part-of: covid
+    name: covid
+    namespace: covid
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: covid
+      deploymentconfig: covid
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        labels:
+          app: covid
+          deploymentconfig: covid
+      spec:
+        containers:
+        - image: image-registry.openshift-image-registry.svc:5000/covid/covid@sha256:db8f8ce23a4ab5fe89d5e67323d0aa097f4f2673580fd119a15228b593c455b8
+          imagePullPolicy: Always
+          name: covid
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              memory: 128Mi
+            requests:
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/app-root/app/appsettings.json
+            name: covid-userservice-configmap
+            subPath: appsettings.json
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: covid-userservice-configmap
+          name: covid-userservice-configmap
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - covid
+        from:
+          kind: ImageStreamTag
+          name: covid:latest
+          namespace: covid
+        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/covid/covid@sha256:db8f8ce23a4ab5fe89d5e67323d0aa097f4f2673580fd119a15228b593c455b8
+      type: ImageChange
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: covid
+    name: covid
+    namespace: covid
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: covid:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: https://github.com/355gts/CovidCore.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+        - name: DOTNET_STARTUP_PROJECT
+          value: Covid.UserService/Covid.UserService/Covid.UserService.csproj
+        from:
+          kind: ImageStreamTag
+          name: dotnet:2.2
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: JW8IorpgwO8PjgIQRH5p
+      type: GitHub
+    - generic:
+        secret: 5_FoqXQXGzwRdy4d4ysu
+      type: Generic
+    - type: ConfigChange
+    - imageChange:
+        lastTriggeredImageID: image-registry.openshift-image-registry.svc:5000/openshift/dotnet@sha256:73237ba08fab93d93075551a95b9e0047e765b0285d98d2fbffb9bbd691c4512
+      type: ImageChange
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    generation: 1
+    labels:
+      app: covid
+    name: covid
+    namespace: covid
+  spec:
+    lookupPolicy:
+      local: false
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/host.generated: "true"
+    labels:
+      app: covid
+    name: covid
+    namespace: covid
+    selfLink: /apis/route.openshift.io/v1/namespaces/covid/routes/covid
+  spec:
+    host: covid-covid.apps.ca-central-1.starter.openshift-online.com
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: covid
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: covid-api
+      deploymentconfig: covid-api
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: covid
+      app.kubernetes.io/part-of: covid
+    name: covid-api
+    namespace: covid
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: covid-api
+      deploymentconfig: covid-api
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: covid-api
+          deploymentconfig: covid-api
+      spec:
+        containers:
+        - image: image-registry.openshift-image-registry.svc:5000/covid/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
+          imagePullPolicy: Always
+          name: covid-api
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/app-root/app/appsettings.Production.json
+            name: covid-api-configmap
+            subPath: appsettings.Production.json
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: covid-api-configmap
+          name: covid-api-configmap
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - covid-api
+        from:
+          kind: ImageStreamTag
+          name: covid-api:latest
+          namespace: covid
+        lastTriggeredImage: image-registry.openshift-image-registry.svc:5000/covid/covid-api@sha256:16c4edf7072b06d8e4011faaa3c079680744bfd2e0cab696163a85e4d928a334
+      type: ImageChange
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: covid-api:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: https://github.com/355gts/CovidCore.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+        - name: DOTNET_STARTUP_PROJECT
+          value: Covid.Api/Covid.Api/Covid.Api.csproj
+        from:
+          kind: ImageStreamTag
+          name: dotnet:2.2
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: LNa7y5KwvC-aZvFBXZs9
+      type: GitHub
+    - generic:
+        secret: bnbTYUO_coJ-VqXHVHpe
+      type: Generic
+    - type: ConfigChange
+    - imageChange:
+        lastTriggeredImageID: image-registry.openshift-image-registry.svc:5000/openshift/dotnet@sha256:73237ba08fab93d93075551a95b9e0047e765b0285d98d2fbffb9bbd691c4512
+      type: ImageChange
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    generation: 1
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid
+  spec:
+    lookupPolicy:
+      local: false
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: covid-api
+    name: covid-api
+    namespace: covid
+  spec:
+    host: covid-api-covid.apps.ca-central-1.starter.openshift-online.com
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: covid-api
+      weight: 100
+    wildcardPolicy: None

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: covid-api-configmap
+ namespace: covid
+data:
+ appsettings.Production.json: |
+   {
+      "ConnectionStrings": {
+        "CovidDatabase": "Server=ec2-3-8-181-169.eu-west-2.compute.amazonaws.com;Database=CovidDb;User Id=SA;Password=Test123Test123;"
+      },
+      "Logging": {
+        "LogLevel": {
+          "Default": "Warning"
+        }
+      },
+      "log4net": {
+        "ConfigFile": "log4net.config"
+      },
+      "AllowedHosts": "*"
+   }
