@@ -5,10 +5,91 @@ def testTemplateName = 'covid-python-template'
 pipeline {
   agent any
   stages {
-    stage ('preamble') {
-      steps {
-        echo 'Placeholder.'
-      }
-    }
+    stage('preamble') {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject() {
+                            echo "Using project: ${openshift.project()}"
+                        }                        
+                    }
+                }          
+            }
+        }
+        stage('create') 
+        {
+            steps 
+            {
+                script
+                {
+                    openshift.withCluster() 
+                    {                      
+                        openshift.withProject()
+                        {
+                            openshift.newApp(templatePath, "--labels='test=true'")                            
+                        }
+                    }
+                }
+            }
+        }      
+        stage('build') 
+        {
+            steps 
+            {
+                script 
+                {
+                    echo "Starting Build"
+                    openshift.withCluster()
+                    {
+                        openshift.withProject() 
+                        {
+                            echo "Getting build configs"
+                            def buildConfigs = openshift.selector("bc",[test: "true", app: "covid"])
+                            echo "Got build configs - ${buildConfigs.names()}"
+                            buildConfigs.withEach
+                            {
+                                def builds = openshift.selector(it.name()).related('builds')
+                                builds.untilEach(1) 
+                                {
+                                    echo "Checking ${it.name()} build status"
+                                    return (it.object().status.phase == "Complete")
+                                }
+                            }
+                            echo "All builds complete"
+                        }                  
+                    }
+                } // script
+            } // steps      
+        } // stage      
+        stage('deploy')
+        {          
+            steps 
+            {
+                script 
+                {
+                    openshift.withCluster()
+                    {
+                        openshift.withProject() 
+                        {
+                            echo "Getting deployment configs"
+                            def deploymentConfigs = openshift.selector("dc", [test: "true", app: "covid"])
+                            echo "Rolling out deployments - ${deploymentConfigs.names()}"
+                            deploymentConfigs.withEach
+                            {
+                                it.rollout()
+                            }
+                            deploymentConfigs.withEach 
+                            {
+                                it.related('pods').untilEach(1)
+                                {
+                                    echo "Waiting for pod ${it.name()} to deploy"
+                                    return (it.object().status.phase == "Running")  
+                                }                          
+                            }
+                        }
+                    }
+                } // script
+            } // steps
+        } // stage  
   }
 }
