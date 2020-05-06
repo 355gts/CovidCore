@@ -4,8 +4,10 @@ def testTemplatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/maste
 def testTemplateName = 'covid-python-template'
 pipeline {
   agent any
-  stages {
-    stage('preamble') {
+  stages 
+  {
+        stage('preamble') 
+        {
             steps {
                 script {
                     openshift.withCluster() {
@@ -90,6 +92,53 @@ pipeline {
                     }
                 } // script
             } // steps
-        } // stage  
+        } 
+        stage('test')
+        {
+            steps
+            {
+                script
+                {
+                    openshift.withCluster()
+                    {
+                        openshift.withProject()
+                        {
+
+                            openshift.newApp(testTemplatePath)
+                            echo "Building the test harness"
+                            def buildConfigs = openshift.selector("bc",[app: "covid-python"])
+                            echo "Got build configs - ${buildConfigs.names()}"
+                            buildConfigs.withEach
+                            {
+                                def builds = openshift.selector(it.name()).related('builds')
+                                builds.untilEach(1) 
+                                {
+                                    echo "Checking ${it.name()} build status"
+                                    return (it.object().status.phase == "Complete")
+                                }
+                            }
+                            echo "Builds complete"
+                            echo "Waiting for test cycle to execute"
+
+                        }
+                    }
+                }
+            }
+        }              
   }
+    post 
+    {
+        always {
+            script 
+            {
+                openshift.withCluster()
+                {
+                    openshift.withProject() {
+                        // delete everything with this template label
+                        openshift.selector("all", [ test : true ]).delete()
+                    }  
+                }   
+            }    
+        } 
+    }
 }
