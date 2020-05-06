@@ -1,7 +1,11 @@
+def templatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/master/Deployment/covid-template.yaml'
+def templateName = 'covid-template'
+def testTemplatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/master/Deployment/covid-python-template.yaml'
+def testTemplateName = 'covid-python-template'
 pipeline {
-  agent
+  agent any
   stages {
-    stage ('Initialize') {
+    stage ('preamble') {
       steps {
         echo 'Placeholder.'
       }
