@@ -25,3 +25,4 @@ for method_frame, properties, body in channel.consume('User'):
       break
 
 connection.close()
+exit()
