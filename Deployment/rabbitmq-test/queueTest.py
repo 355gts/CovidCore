@@ -9,6 +9,7 @@ parameters = pika.ConnectionParameters('ec2-3-8-181-169.eu-west-2.compute.amazon
                                        credentials)
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
+channel.queue_purge('User')
 channel.basic_publish(exchange='User', routing_key='CreateUser', body='{ "Firstname":"Python", "Surname":"Python", "DateOfBirth":"2018/06/05T13:14:15"}')
 for method_frame, properties, body in channel.consume('User'):
 
@@ -20,6 +21,7 @@ for method_frame, properties, body in channel.consume('User'):
     	raise Exception("Incorrect message details {0}".format(messageBody))
     	break
     else:
-    	break
+      print('Message processed')
+      break
 
 connection.close()
