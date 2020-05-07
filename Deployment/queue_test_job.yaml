@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: covid-python-job
+  app: covid
+spec:
+  parallelism: 1    
+  completions: 1    
+  activeDeadlineSeconds: 1800 
+  backoffLimit: 6   
+  template:         
+    metadata:
+      name: covid-python-job
+    spec:
+      containers:
+      - name: covid-python
+        image: image-registry.openshift-image-registry.svc:5000/covid/covid-python:latest
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+        env:
+          - name: APP_FILE
+            value: queueTest.py
+      restartPolicy: OnFailure    

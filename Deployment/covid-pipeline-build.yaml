@@ -2,7 +2,7 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: covid-pipeline
-  namespace: covid-test
+  namespace: covid
 spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: {}
@@ -11,50 +11,11 @@ spec:
   resources: {}
   runPolicy: Serial
   source:
-    type: None
+    git:
+      uri: https://github.com/355gts/CovidCore.git
   strategy:
     jenkinsPipelineStrategy:
-      jenkinsfile: "def templatePath = 'https://raw.githubusercontent.com/355gts/CovidCore/master/Deployment/covid-template.yaml'\ndef
-        templateName = 'covid-template'\npipeline{\n  agent any\n  options{\n    timeout(time:
-        20, unit: 'MINUTES')\n  }\n  stages {\n      stage('preamble') {\n          steps
-        {\n              script {\n                  openshift.withCluster() {\n                      openshift.withProject()
-        {\n                          echo \"Using project: ${openshift.project()}\"\n
-        \                     }\n                  }\n              }\n          }\n
-        \     }       \n      stage('create') {\n          steps {\n              script
-        {\n                  openshift.withCluster() {\n                      openshift.withProject()
-        {\n                          openshift.newApp(templatePath, \"--labels='test=true'\")
-        \n                      }\n                  }\n              }\n          }\n
-        \     }\n      stage('build') {\n          steps {\n              script {\n
-        \                 echo \"Starting Build\"\n                  openshift.withCluster()
-        {\n                      openshift.withProject() {\n                          echo
-        \"Getting build configs\"\n                          def buildConfigs = openshift.selector(\"bc\",
-        [test: \"true\", app: \"covid\"])\n                          echo \"Got build
-        configs - ${buildConfigs.names()}\"\n                          buildConfigs.withEach
-        {\n                              def builds = openshift.selector(it.name()).related('builds')\n
-        \                             builds.untilEach(1) {\n                                echo
-        \"Checking ${it.name()} build status\"\n                                return
-        (it.object().status.phase == \"Complete\")\n                              }\n
-        \                         }\n                          echo \"All builds complete\"\n
-        \                         \n                      }\n                  }\n
-        \             } // script\n          } // steps\n      } // stage\n      stage('deploy')
-        {\n          steps {\n              script {\n                  openshift.withCluster()
-        {\n                      openshift.withProject() {\n                          echo
-        \"Getting deployment configs\"\n                          def deploymentConfigs
-        = openshift.selector(\"dc\", [test: \"true\", app: \"covid\"])\n                          echo
-        \"Rolling out deployments - ${deploymentConfigs.names()}\"\n                          deploymentConfigs.withEach
-        {\n                              it.rollout()\n                          }\n
-        \                         deploymentConfigs.withEach {\n                              it.related('pods').untilEach(1)
-        {\n                                  echo \"Waiting for pod ${it.name()} to
-        deploy\"\n                                  return (it.object().status.phase
-        == \"Running\")  \n                              }\n                          }\n
-        \                     }\n                  }\n              } // script\n
-        \         } // steps\n      } // stage                \n  }\n  // post {\n
-        \ //     always{\n  //         // script {\n  //         //           openshift.withCluster()
-        {\n  //         //               openshift.withProject() {\n  //         //
-        \                  // delete everything with this template label\n  //         //
-        \                  openshift.selector(\"all\", [ test : true ]).delete()                                    \n
-        \ //         //               }\n  //         //           }\n  //         //
-        \      }\n  //     }\n  // }\n}"
+      jenkinsfilePath: Deployment/covid.jenkinsfile 
     type: JenkinsPipeline
   successfulBuildsHistoryLimit: 5
   triggers:

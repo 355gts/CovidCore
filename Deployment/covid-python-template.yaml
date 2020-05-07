@@ -1,0 +1,143 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: covid
+  template: covid-python-template
+metadata:
+  annotations:
+    description: Creates a new instance of the Covid Python Test Application
+    openshift.io/display-name: Covid
+    openshift.io/documentation-url: https://github.com/355gts/CovidCore
+    openshift.io/provider-display-name: Kieron Macknight
+    openshift.io/support-url: https://github.com/355gts/CovidCore
+    tags: covid
+  creationTimestamp: null
+  name: covid-python
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      app.openshift.io/vcs-ref: master
+      app.openshift.io/vcs-uri: https://github.com/355gts/CovidCore.git
+    labels:
+      app: covid-python
+      app.kubernetes.io/component: covid-python
+      app.kubernetes.io/instance: covid-python
+      app.kubernetes.io/name: python
+      app.kubernetes.io/part-of: covid
+      app.openshift.io/runtime: python
+      app.openshift.io/runtime-version: "3.6"
+    name: covid-python
+    namespace: covid
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: covid-python
+      deploymentconfig: covid-python
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      app.openshift.io/vcs-ref: master
+      app.openshift.io/vcs-uri: https://github.com/355gts/CovidCore.git
+    labels:
+      app: covid-python
+      app.kubernetes.io/component: covid-python
+      app.kubernetes.io/instance: covid-python
+      app.kubernetes.io/name: python
+      app.kubernetes.io/part-of: covid
+      app.openshift.io/runtime: python
+      app.openshift.io/runtime-version: "3.6"
+    name: covid-python
+    namespace: covid
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: covid-python:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: /Deployment/rabbitmq-test
+      git:
+        uri: https://github.com/355gts/CovidCore.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: python:3.6
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - generic:
+        secretReference:
+          name: covid-python-generic-webhook-secret
+      type: Generic
+    - github:
+        secretReference:
+          name: covid-python-github-webhook-secret
+      type: GitHub
+    - imageChange:
+        lastTriggeredImageID: image-registry.openshift-image-registry.svc:5000/openshift/python@sha256:627776c4616bd4b93b2c9b7f3b513674e9cebd1f085dbd86e0a756576b372c3b
+      type: ImageChange
+    - type: ConfigChange
+  status:
+    lastVersion: 1
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      app.openshift.io/vcs-ref: master
+      app.openshift.io/vcs-uri: https://github.com/355gts/CovidCore.git
+    generation: 1
+    labels:
+      app: covid-python
+      app.kubernetes.io/component: covid-python
+      app.kubernetes.io/instance: covid-python
+      app.kubernetes.io/name: python
+      app.kubernetes.io/part-of: covid
+      app.openshift.io/runtime: python
+      app.openshift.io/runtime-version: "3.6"
+    name: covid-python
+    namespace: covid
+  spec:
+    lookupPolicy:
+      local: false  
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: covid-python-job
+    app: covid
+  spec:
+    parallelism: 1    
+    completions: 1    
+    activeDeadlineSeconds: 1800 
+    backoffLimit: 6   
+    template:         
+      metadata:
+        name: covid-python-job
+      spec:
+        containers:
+        - name: covid-python
+          image: image-registry.openshift-image-registry.svc:5000/covid/covid-python:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: APP_FILE
+              value: queueTest.py
+        restartPolicy: OnFailure    
