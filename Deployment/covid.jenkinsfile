@@ -135,7 +135,7 @@ pipeline {
                 {
                     openshift.withProject() {
                         // delete everything with this template label
-                        openshift.selector("all", [ test : true ]).delete()
+                        //openshift.selector("all", [ test : true ]).delete()
                     }  
                 }   
             }    
