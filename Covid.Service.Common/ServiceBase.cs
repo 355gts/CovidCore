@@ -1,9 +1,9 @@
-﻿using log4net;
+﻿using CommonUtils.Logging;
+using log4net;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Reflection;
-using System.Xml;
 
 
 namespace Covid.Service.Common
@@ -19,8 +19,8 @@ namespace Covid.Service.Common
 
         public ServiceBase()
         {
-            ConfigureLogging();
             LoadConfiguration();
+            //ConfigureLogging();
         }
 
         private void LoadConfiguration()
@@ -57,16 +57,17 @@ namespace Covid.Service.Common
             {
                 _logger.Info($"Attempting to locate log4net config at location: '{log4netFilename}'.");
 
-                if (!File.Exists(log4netFilename))
-                    throw new FileNotFoundException($"Failed to find '{log4netFilename}' file.", log4netFilename);
+                //if (!File.Exists(log4netFilename))
+                //    throw new FileNotFoundException($"Failed to find '{log4netFilename}' file.", log4netFilename);
 
-                XmlDocument log4netConfig = new XmlDocument();
-                log4netConfig.Load(File.OpenRead(log4netFilename));
+                //XmlDocument log4netConfig = new XmlDocument();
+                //log4netConfig.Load(File.OpenRead(log4netFilename));
 
-                var repo = LogManager.CreateRepository(
+                var loggerRepository = LogManager.CreateRepository(
                     Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
 
-                log4net.Config.XmlConfigurator.Configure(repo, log4netConfig[log4netName]);
+                //LogConfiguration.Initialize(loggerRepository);
+                //log4net.Config.XmlConfigurator.Configure(repo, log4netConfig[log4netName]);
 
                 _logger.Info("Logging initialized.");
             }

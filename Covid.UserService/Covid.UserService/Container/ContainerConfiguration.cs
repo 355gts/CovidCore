@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using CommonUtils.Logging.Configuration;
 using Covid.Common.Extensions;
 using Covid.Common.HttpClientHelper;
 using Covid.Common.HttpClientHelper.Configuration;
@@ -45,6 +46,7 @@ namespace Covid.UserService.Container
             // register configuration sections
             containerBuilder.RegisterConfigurationSection<IQueueConfiguration, QueueConfiguration>(configuration, "queueConfiguration");
             containerBuilder.RegisterConfigurationSection<IEnumerable<IHttpClientConfiguration>, List<HttpClientConfiguration>>(configuration, "services");
+            containerBuilder.RegisterConfigurationSection<ILog4NetConfiguration, Log4NetConfiguration>(configuration, "log4net");
 
             // load the assembly containing the mappers
             var executingAssembly = Assembly.Load("Covid.UserService");

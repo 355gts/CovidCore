@@ -1,4 +1,6 @@
 ﻿using Autofac;
+using CommonUtils.Logging;
+using CommonUtils.Logging.Configuration;
 using Covid.Service.Common;
 using Covid.UserService.Container;
 using Covid.UserService.EventListeners;
@@ -27,15 +29,18 @@ namespace Covid.UserService
 
         public bool Start(HostControl hostControl)
         {
-            _logger.Info($"Starting service '{nameof(UserService)}'");
-
             using (var scope = _container.BeginLifetimeScope())
             {
+                // retrieve the log4net configuration and configure logging
+                LogConfiguration.Initialize(scope.Resolve<ILog4NetConfiguration>());
+
+                _logger.Info($"Starting service '{nameof(UserService)}'");
+
                 var userEventListener = scope.Resolve<UserEventListener>();
                 _tasks.Add(userEventListener.Run());
-            }
 
-            _logger.Info($"Started service '{nameof(UserService)}'");
+                _logger.Info($"Started service '{nameof(UserService)}'");
+            }
 
             return true;
         }

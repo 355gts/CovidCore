@@ -19,6 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\CommonUtils\CommonUtils\CommonUtils\CommonUtils.csproj" />
     <ProjectReference Include="..\Covid.Message.Model\Covid.Message.Model.csproj" />
     <ProjectReference Include="..\Covid.Rabbit\Covid.Rabbit.csproj" />
     <ProjectReference Include="..\Covid.Web.Model\Covid.Web.Model.csproj" />
