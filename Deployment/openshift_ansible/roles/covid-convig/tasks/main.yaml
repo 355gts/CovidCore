@@ -14,12 +14,12 @@
 - set_fact:
     regex_filter: "^.*\\/(Covid.*)\\/appsettings\\.json"
 - debug:
-    msg: "{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.json', '\\1.json') }}"
+    msg: "{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
 - template:
     src: "{{ item.path }}"
-    dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.json', '\\1.json') }}"
+    dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
 #- name: Test the OC connection
