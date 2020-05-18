@@ -1,0 +1,34 @@
+---
+
+- name: Make a directory for the config 
+  file:
+    path: ./config
+    state: directory
+- name: Get the config files
+  find:
+    paths: /home/ec2-user/CovidCore/
+    patterns: "appsettings*.json"
+    use_regex: yes
+    recurse: yes
+  register: config_files
+- set_fact:
+    regex_filter: "^.*\\/(Covid.*)\\/appsettings\\.json"
+- debug:
+    msg: "{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.json', '\\1.json') }}"
+  with_items:
+    - "{{ config_files.files }}"
+- template:
+    src: "{{ item.path }}"
+    dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.json', '\\1.json') }}"
+  with_items:
+    - "{{ config_files.files }}"
+#- name: Test the OC connection
+#  k8s_info:
+#    api_version: v1
+#    kind: Service
+#    namespace: covid
+#    host: https://api.ca-central-1.starter.openshift-online.com:6443
+#    api_key: ze47el0h0BwmD1zQklcgtF6HvC_atD27kuoPePERSLU
+#  register: service_list
+#- debug:
+#    msg: "{{ service_list }}"    

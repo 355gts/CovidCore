@@ -1,0 +1,5 @@
+---
+
+- hosts: openshift-4
+  roles: 
+    - covid-convig

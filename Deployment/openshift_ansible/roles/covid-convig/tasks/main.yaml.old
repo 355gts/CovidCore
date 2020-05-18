@@ -1,0 +1,8 @@
+---
+
+- name: Delete the current config map
+  uri:
+    url:
+- name: Push the config map changes to Openshift
+  uri:
+    url:  
