@@ -9,6 +9,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Covid.Rabbit.Consumer
         private readonly IJsonSerializer _serializer;
         private readonly string _consumerName;
         private readonly IQueueConfiguration _queueConfiguration;
-        private readonly IQueueConfig _queueConfig;
+        private readonly IConsumerConfiguration _consumerConfig;
         private readonly CancellationToken _cancellationToken;
         private bool _connected;
         private readonly object _lock = new object();
@@ -48,10 +49,10 @@ namespace Covid.Rabbit.Consumer
             _cancellationToken = cancellationToken;
 
             // retrieve the specific queues configuration
-            _queueConfig = queueConfiguration[_consumerName];
+            _consumerConfig = queueConfiguration.Consumers?.FirstOrDefault(c => c.Name == _consumerName);
 
-            if (_queueConfig == null)
-                throw new ArgumentNullException(nameof(_queueConfig));
+            if (_consumerConfig == null)
+                throw new ArgumentNullException(nameof(_consumerConfig));
 
         }
 
@@ -61,10 +62,10 @@ namespace Covid.Rabbit.Consumer
             {
                 if (!_connected)
                 {
-                    _connection = _connectionFactory.CreateConnection(_queueConfig.Name, _cancellationToken);
+                    _connection = _connectionFactory.CreateConnection(_consumerConfig.Name, _cancellationToken);
 
                     _channel = _connection.CreateModel();
-                    _channel.BasicQos(0, _queueConfiguration.MaxPrefetchSize, false);
+                    _channel.BasicQos(0, _queueConfiguration.MessagePrefetchCount, false);
 
                     var consumer = new EventingBasicConsumer(_channel);
                     consumer.Received += async (model, ea) =>
@@ -99,7 +100,7 @@ namespace Covid.Rabbit.Consumer
 
                     var dynamicQueue = $"{Resources.DynamicQueuePrefix}_{Guid.NewGuid().ToString()}";
                     // if the queue is not specified in the config then create a dynamic queue and bind to the exchange
-                    if (string.IsNullOrEmpty(_queueConfig.Queue))
+                    if (string.IsNullOrEmpty(_consumerConfig.QueueName))
                     {
                         var queueDeclareResult = _channel.QueueDeclare(dynamicQueue, true, true, true, null);
                         if (queueDeclareResult == null)
@@ -107,10 +108,10 @@ namespace Covid.Rabbit.Consumer
                             // TODO handle this result correctly
                         }
 
-                        _channel.QueueBind(dynamicQueue, _queueConfig.Exchange, _queueConfig.RoutingKey);
+                        _channel.QueueBind(dynamicQueue, _consumerConfig.ExchangeName, _consumerConfig.RoutingKey);
                     }
 
-                    _channel.BasicConsume(queue: !string.IsNullOrEmpty(_queueConfig.Queue) ? _queueConfig.Queue : dynamicQueue,
+                    _channel.BasicConsume(queue: !string.IsNullOrEmpty(_consumerConfig.QueueName) ? _consumerConfig.QueueName : dynamicQueue,
                                          autoAck: false,
                                          consumer: consumer);
 

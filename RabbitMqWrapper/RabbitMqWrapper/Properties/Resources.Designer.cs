@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Covid.Rabbit.Properties {
+namespace RabbitMqWrapper.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Covid.Rabbit.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Covid.Rabbit.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RabbitMqWrapper.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,11 @@ namespace Covid.Rabbit.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to COVID.
+        ///   Looks up a localized string similar to Could not find unique certificate with subject name &apos;{0}&apos;. (Found {1} certificates)..
         /// </summary>
-        internal static string DynamicQueuePrefix {
+        internal static string CouldNotFindCertificateError {
             get {
-                return ResourceManager.GetString("DynamicQueuePrefix", resourceCulture);
+                return ResourceManager.GetString("CouldNotFindCertificateError", resourceCulture);
             }
         }
     }

@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\Covid.Common\log4net.config" Link="log4net.config" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
-    <Content Include="appsettings.Production.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
-    <Content Include="appsettings.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always"/>
+    <Content Include="..\..\Covid.Common\log4net.config" Link="log4net.config" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always" />
+    <Content Include="appsettings.Production.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always" />
+    <Content Include="appsettings.json" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,12 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CommonUtils\CommonUtils\CommonUtils\CommonUtils.csproj" />
     <ProjectReference Include="..\..\Covid.Common.HttpClientHelper\Covid.Common.HttpClientHelper.csproj" />
-    <ProjectReference Include="..\..\Covid.CommonUtils\Covid.CommonUtils.csproj" />
     <ProjectReference Include="..\..\Covid.Common\Covid.Common.csproj" />
     <ProjectReference Include="..\..\Covid.Message.Model\Covid.Message.Model.csproj" />
-    <ProjectReference Include="..\..\Covid.Rabbit\Covid.Rabbit.csproj" />
     <ProjectReference Include="..\..\Covid.Service.Common\Covid.Service.Common.csproj" />
     <ProjectReference Include="..\..\Covid.Web.Model\Covid.Web.Model.csproj" />
+    <ProjectReference Include="..\..\RabbitMqWrapper\RabbitMqWrapper\RabbitMqWrapper.csproj" />
   </ItemGroup>
 </Project>

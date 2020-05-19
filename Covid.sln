@@ -13,13 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Repository.Model", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Service.Common", "Covid.Service.Common\Covid.Service.Common.csproj", "{EAE86398-6DAD-4162-9CE3-8C60B66E6CDD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Rabbit", "Covid.Rabbit\Covid.Rabbit.csproj", "{46D15E6A-9594-4EDC-B8A1-6BFB4DE7636D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Message.Model", "Covid.Message.Model\Covid.Message.Model.csproj", "{9F5DE183-710D-48D9-B753-065D70276345}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Common.HttpClientHelper", "Covid.Common.HttpClientHelper\Covid.Common.HttpClientHelper.csproj", "{FEA84BE4-B5B9-4C7A-895A-D9F16350D073}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.CommonUtils", "Covid.CommonUtils\Covid.CommonUtils.csproj", "{BE8D31F8-DA92-473B-9EB9-14545754A4D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}"
 EndProject
@@ -31,9 +27,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.UserService.UnitTest"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Api.UnitTests", "Covid.Api\Covid.Api.UnitTests\Covid.Api.UnitTests.csproj", "{23323E4F-6404-4B54-B521-7D76299640DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils", "CommonUtils\CommonUtils\CommonUtils\CommonUtils.csproj", "{D93C9EF1-5D74-43AE-B690-731AF3301E67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils", "CommonUtils\CommonUtils\CommonUtils\CommonUtils.csproj", "{D93C9EF1-5D74-43AE-B690-731AF3301E67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils.UnitTest", "CommonUtils\CommonUtils.UnitTest\CommonUtils.UnitTest\CommonUtils.UnitTest.csproj", "{F7AA4C66-C173-4544-A147-0598E9498E98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtils.UnitTest", "CommonUtils\CommonUtils.UnitTest\CommonUtils.UnitTest\CommonUtils.UnitTest.csproj", "{F7AA4C66-C173-4544-A147-0598E9498E98}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covid.Rabbit.UnitTest", "Covid.Rabbit\Covid.Rabbit.UnitTest\Covid.Rabbit.UnitTest.csproj", "{DABB13F3-D8C9-4085-8631-CAD2CDE22C46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMqWrapper", "RabbitMqWrapper\RabbitMqWrapper\RabbitMqWrapper.csproj", "{D6F0BBAB-3AC1-4DCA-919E-454EC94E57C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,10 +61,6 @@ Global
 		{EAE86398-6DAD-4162-9CE3-8C60B66E6CDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAE86398-6DAD-4162-9CE3-8C60B66E6CDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAE86398-6DAD-4162-9CE3-8C60B66E6CDD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{46D15E6A-9594-4EDC-B8A1-6BFB4DE7636D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{46D15E6A-9594-4EDC-B8A1-6BFB4DE7636D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{46D15E6A-9594-4EDC-B8A1-6BFB4DE7636D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{46D15E6A-9594-4EDC-B8A1-6BFB4DE7636D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F5DE183-710D-48D9-B753-065D70276345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9F5DE183-710D-48D9-B753-065D70276345}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F5DE183-710D-48D9-B753-065D70276345}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -73,10 +69,6 @@ Global
 		{FEA84BE4-B5B9-4C7A-895A-D9F16350D073}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEA84BE4-B5B9-4C7A-895A-D9F16350D073}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEA84BE4-B5B9-4C7A-895A-D9F16350D073}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BE8D31F8-DA92-473B-9EB9-14545754A4D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE8D31F8-DA92-473B-9EB9-14545754A4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE8D31F8-DA92-473B-9EB9-14545754A4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE8D31F8-DA92-473B-9EB9-14545754A4D6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F30723BF-9892-4D76-995D-0E04EEF376AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F30723BF-9892-4D76-995D-0E04EEF376AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F30723BF-9892-4D76-995D-0E04EEF376AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -101,6 +93,14 @@ Global
 		{F7AA4C66-C173-4544-A147-0598E9498E98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7AA4C66-C173-4544-A147-0598E9498E98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7AA4C66-C173-4544-A147-0598E9498E98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DABB13F3-D8C9-4085-8631-CAD2CDE22C46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DABB13F3-D8C9-4085-8631-CAD2CDE22C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DABB13F3-D8C9-4085-8631-CAD2CDE22C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DABB13F3-D8C9-4085-8631-CAD2CDE22C46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6F0BBAB-3AC1-4DCA-919E-454EC94E57C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6F0BBAB-3AC1-4DCA-919E-454EC94E57C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6F0BBAB-3AC1-4DCA-919E-454EC94E57C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6F0BBAB-3AC1-4DCA-919E-454EC94E57C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,6 +109,7 @@ Global
 		{519DCCDF-0462-41D7-AE41-29D65AE84563} = {C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}
 		{23323E4F-6404-4B54-B521-7D76299640DD} = {C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}
 		{F7AA4C66-C173-4544-A147-0598E9498E98} = {C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}
+		{DABB13F3-D8C9-4085-8631-CAD2CDE22C46} = {C4DC86CE-4DB9-4431-8EFE-8F1B21470D68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2ECCA3A2-8FEF-4755-9F39-FF53D1C55F2F}

@@ -10,21 +10,14 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.3.2" />
     <PackageReference Include="MSTest.TestFramework" Version="1.3.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Covid.Api\Covid.Api.csproj" />
+    <ProjectReference Include="..\..\CommonUtils\CommonUtils\CommonUtils\CommonUtils.csproj" />
     <ProjectReference Include="..\..\Covid.Common\Covid.Common.csproj" />
     <ProjectReference Include="..\..\Covid.Message.Model\Covid.Message.Model.csproj" />
-    <ProjectReference Include="..\..\Covid.Repository.Model\Covid.Repository.Model.csproj" />
-    <ProjectReference Include="..\..\Covid.Repository\Covid.Repository.csproj" />
-    <ProjectReference Include="..\..\Covid.Web.Model\Covid.Web.Model.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\V2\" />
-    <Folder Include="Controllers\V1\" />
-    <Folder Include="Mappers\" />
   </ItemGroup>
 
 </Project>

@@ -2,9 +2,9 @@
 using Covid.Common.Mapper;
 using Covid.Message.Model.Publisher;
 using Covid.Message.Model.Users;
-using Covid.Rabbit;
-using Covid.Rabbit.Consumer;
 using log4net;
+using RabbitMqWrapper;
+using RabbitMqWrapper.Consumer;
 using System;
 using System.Threading.Tasks;
 using Dom = Covid.Web.Model.Users;

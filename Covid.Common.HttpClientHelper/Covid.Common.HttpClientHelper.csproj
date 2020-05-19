@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Covid.CommonUtils\Covid.CommonUtils.csproj" />
+    <ProjectReference Include="..\CommonUtils\CommonUtils\CommonUtils\CommonUtils.csproj" />
     <ProjectReference Include="..\Covid.Common\Covid.Common.csproj" />
     <ProjectReference Include="..\Covid.Web.Model\Covid.Web.Model.csproj" />
   </ItemGroup>

@@ -5,6 +5,7 @@ using Covid.Rabbit.Factories;
 using log4net;
 using RabbitMQ.Client;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -16,7 +17,7 @@ namespace Covid.Rabbit.Publisher
         private readonly IQueueConnectionFactory _connectionFactory;
         private readonly IJsonSerializer _serializer;
         private readonly string _publisherName;
-        private readonly IQueueConfig _queueConfig;
+        private readonly IPublisherConfiguration _publisherConfig;
         private readonly CancellationToken _cancellationToken;
         private bool _connected;
         private readonly object _lock = new object();
@@ -41,10 +42,10 @@ namespace Covid.Rabbit.Publisher
             _cancellationToken = cancellationToken;
 
             // retrieve the specific queues configuration
-            _queueConfig = queueConfiguration[_publisherName];
+            _publisherConfig = queueConfiguration.Publishers?.FirstOrDefault(c => c.Name == _publisherName);
 
-            if (_queueConfig == null)
-                throw new ArgumentNullException(nameof(_queueConfig));
+            if (_publisherConfig == null)
+                throw new ArgumentNullException(nameof(_publisherConfig));
         }
 
         public void Publish(T message, string routingKey = null)
@@ -54,7 +55,7 @@ namespace Covid.Rabbit.Publisher
             {
                 if (!_connected)
                 {
-                    _connection = _connectionFactory.CreateConnection(_queueConfig.Name, _cancellationToken);
+                    _connection = _connectionFactory.CreateConnection(_publisherConfig.Name, _cancellationToken);
 
                     _channel = _connection.CreateModel();
 
@@ -66,8 +67,8 @@ namespace Covid.Rabbit.Publisher
 
                 var body = Encoding.UTF8.GetBytes(_serializer.SerializeObject(message));
 
-                _channel.BasicPublish(exchange: _queueConfig.Exchange,
-                                     routingKey: !string.IsNullOrEmpty(routingKey) ? routingKey : _queueConfig.RoutingKey,
+                _channel.BasicPublish(exchange: _publisherConfig.ExchangeName,
+                                     routingKey: !string.IsNullOrEmpty(routingKey) ? routingKey : _publisherConfig.RoutingKey,
                                      basicProperties: null,
                                      body: body);
                 _logger.Info($"Sent message");

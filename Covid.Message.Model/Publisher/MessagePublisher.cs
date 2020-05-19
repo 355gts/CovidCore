@@ -1,5 +1,5 @@
 ﻿using Covid.Message.Model.Users;
-using Covid.Rabbit.Publisher;
+using RabbitMqWrapper.Publisher;
 using System;
 
 namespace Covid.Message.Model.Publisher
