@@ -64,6 +64,12 @@ namespace RabbitMqWrapper.Factories
         {
             lock (_lock)
             {
+                // if the connection is disposed remove it so that it can be re-initalised
+                if (_connections.ContainsKey(connectionName) && _connections[connectionName].IsDisposed)
+                {
+                    _connections.TryRemove(connectionName, out _);
+                }
+
                 if (!_connections.ContainsKey(connectionName))
                 {
                     var _connectionHandler = new ConnectionHandler(connectionName, _connectionFactory.CreateConnection(), cancellationToken, _queueWrapperConfig.AutomaticRecoveryEnabled);

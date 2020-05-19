@@ -135,4 +135,7 @@
   <data name="ProcessingErrorLogEntry" xml:space="preserve">
     <value>Message with delivery tag '{0}' failed to be processed. {1}</value>
   </data>
+  <data name="PublishingMessageLogEntry" xml:space="preserve">
+    <value>Publishing message to exchange '{0}' with routing key '{1}': {2}</value>
+  </data>
 </root>

@@ -113,5 +113,14 @@ namespace RabbitMqWrapper.Properties {
                 return ResourceManager.GetString("ProcessingErrorLogEntry", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publishing message to exchange &apos;{0}&apos; with routing key &apos;{1}&apos;: {2}.
+        /// </summary>
+        internal static string PublishingMessageLogEntry {
+            get {
+                return ResourceManager.GetString("PublishingMessageLogEntry", resourceCulture);
+            }
+        }
     }
 }

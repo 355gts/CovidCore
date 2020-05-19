@@ -71,92 +71,93 @@ namespace RabbitMqWrapper.Consumer
         {
             try
             {
-                if (!_connected)
+                lock (_lock)
                 {
-                    _connection = _connectionFactory.CreateConnection(_consumerConfig.Name, _cancellationToken);
-
-                    _channel = _connection.CreateModel();
-                    _channel.BasicQos(0, _queueConfiguration.MessagePrefetchCount, false);
-
-                    var consumer = new EventingBasicConsumer(_channel);
-                    consumer.Received += async (model, ea) =>
+                    if (!_connected)
                     {
-                        var body = ea.Body;
-                        var deliveryTag = ea.DeliveryTag;
-                        var routingKey = ea.RoutingKey;
+                        _connection = _connectionFactory.CreateConnection(_consumerConfig.Name, _cancellationToken);
 
-                        using (var performanceLogger = new PerformanceLogger(performanceLoggingMethodName))
+                        _channel = _connection.CreateModel();
+                        _channel.BasicQos(0, _queueConfiguration.MessagePrefetchCount, false);
+
+                        var consumer = new EventingBasicConsumer(_channel);
+                        consumer.Received += async (model, ea) =>
                         {
-                            try
+                            var body = ea.Body;
+                            var deliveryTag = ea.DeliveryTag;
+                            var routingKey = ea.RoutingKey;
+
+                            using (var performanceLogger = new PerformanceLogger(performanceLoggingMethodName))
                             {
-                                var message = _serializer.Deserialize<T>(Encoding.UTF8.GetString(body));
+                                try
+                                {
+                                    var message = _serializer.Deserialize<T>(Encoding.UTF8.GetString(body));
 
                                 // Validate object
                                 string validationErrors;
-                                bool success = _validationHelper.TryValidate(message, out validationErrors);
-                                if (!success)
-                                {
-                                    _logger.ErrorFormat(
-                                        Resources.MessageFailsValidationLogEntry,
-                                        deliveryTag,
-                                        _consumerConfig.QueueName,
-                                        validationErrors);
-                                    _channel.BasicNack(deliveryTag, false, false);
+                                    bool success = _validationHelper.TryValidate(message, out validationErrors);
+                                    if (!success)
+                                    {
+                                        _logger.ErrorFormat(
+                                            Resources.MessageFailsValidationLogEntry,
+                                            deliveryTag,
+                                            _consumerConfig.QueueName,
+                                            validationErrors);
+                                        _channel.BasicNack(deliveryTag, false, false);
+                                    }
+
+                                    if (Behaviour == AcknowledgeBehaviour.BeforeProcess)
+                                        _channel.BasicAck(deliveryTag, false);
+
+                                    await onMessage(message, deliveryTag, routingKey);
+
+                                    if (Behaviour == AcknowledgeBehaviour.AfterProcess)
+                                        _channel.BasicAck(deliveryTag, false);
+
+                                    if (Behaviour != AcknowledgeBehaviour.Never)
+                                        _logger.InfoFormat(Resources.MessageProcessedLogEntry, deliveryTag);
                                 }
+                                catch (AlreadyClosedException ex)
+                                {
+                                    _logger.Warn($"The connection to Rabbit was closed while processing message with deliveryTag '{deliveryTag}', error details - '{ex.Message}'.");
+                                }
+                                catch (FatalErrorException e)
+                                {
+                                    if (Behaviour == AcknowledgeBehaviour.AfterProcess
+                                     || Behaviour == AcknowledgeBehaviour.Async)
+                                        _channel.BasicNack(deliveryTag, false, false);
 
-                                if (Behaviour == AcknowledgeBehaviour.BeforeProcess)
-                                    _channel.BasicAck(deliveryTag, false);
+                                    _logger.Fatal(Resources.FatalErrorLogEntry, e);
+                                    throw;
+                                }
+                                catch (Exception e)
+                                {
+                                    _logger.ErrorFormat(Resources.ProcessingErrorLogEntry, deliveryTag, e);
 
-                                await onMessage(message, deliveryTag, routingKey);
-
-                                if (Behaviour == AcknowledgeBehaviour.AfterProcess)
-                                    _channel.BasicAck(deliveryTag, false);
-
-                                if (Behaviour != AcknowledgeBehaviour.Never)
-                                    _logger.InfoFormat(Resources.MessageProcessedLogEntry, deliveryTag);
+                                    if (Behaviour == AcknowledgeBehaviour.AfterProcess
+                                     || Behaviour == AcknowledgeBehaviour.Async)
+                                        _channel.BasicNack(deliveryTag, false, false);
+                                }
                             }
-                            catch (AlreadyClosedException ex)
-                            {
-                                _logger.Warn($"The connection to Rabbit was closed while processing message with deliveryTag '{deliveryTag}', error details - '{ex.Message}'.");
-                            }
-                            catch (FatalErrorException e)
-                            {
-                                if (Behaviour == AcknowledgeBehaviour.AfterProcess
-                                 || Behaviour == AcknowledgeBehaviour.Async)
-                                    _channel.BasicNack(deliveryTag, false, false);
+                        };
 
-                                _logger.Fatal(Resources.FatalErrorLogEntry, e);
-                                throw;
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.ErrorFormat(Resources.ProcessingErrorLogEntry, deliveryTag, e);
-
-                                if (Behaviour == AcknowledgeBehaviour.AfterProcess
-                                 || Behaviour == AcknowledgeBehaviour.Async)
-                                    _channel.BasicNack(deliveryTag, false, false);
-                            }
-                        }
-                    };
-
-                    var dynamicQueue = $"{_queueConfiguration.TemporaryQueueNamePrefix}_{Guid.NewGuid().ToString()}";
-                    // if the queue is not specified in the config then create a dynamic queue and bind to the exchange
-                    if (string.IsNullOrEmpty(_consumerConfig.QueueName))
-                    {
-                        var queueDeclareResult = _channel.QueueDeclare(dynamicQueue, true, true, true, null);
-                        if (queueDeclareResult == null)
+                        var dynamicQueue = $"{_queueConfiguration.TemporaryQueueNamePrefix}_{Guid.NewGuid().ToString()}";
+                        // if the queue is not specified in the config then create a dynamic queue and bind to the exchange
+                        if (string.IsNullOrEmpty(_consumerConfig.QueueName))
                         {
-                            // TODO handle this result correctly
+                            var queueDeclareResult = _channel.QueueDeclare(dynamicQueue, true, true, true, null);
+                            if (queueDeclareResult == null)
+                            {
+                                // TODO handle this result correctly
+                            }
+
+                            _channel.QueueBind(dynamicQueue, _consumerConfig.ExchangeName, _consumerConfig.RoutingKey);
                         }
 
-                        _channel.QueueBind(dynamicQueue, _consumerConfig.ExchangeName, _consumerConfig.RoutingKey);
-                    }
+                        _channel.BasicConsume(queue: !string.IsNullOrEmpty(_consumerConfig.QueueName) ? _consumerConfig.QueueName : dynamicQueue,
+                                             autoAck: false,
+                                             consumer: consumer);
 
-                    _channel.BasicConsume(queue: !string.IsNullOrEmpty(_consumerConfig.QueueName) ? _consumerConfig.QueueName : dynamicQueue,
-                                         autoAck: false,
-                                         consumer: consumer);
-                    lock (_lock)
-                    {
                         _connected = true;
                     }
                 }

@@ -12,7 +12,7 @@ namespace RabbitMqWrapper.Connection
     public class ConnectionHandler : IConnectionHandler
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(ConnectionHandler));
-        private bool isDisposed;
+        public bool IsDisposed { get; set; }
         private readonly string _connectionName;
         private IConnection _connection;
         private readonly CancellationToken _cancellationToken;
@@ -106,7 +106,7 @@ namespace RabbitMqWrapper.Connection
 
         protected virtual void Dispose(bool disposing)
         {
-            if (isDisposed) return;
+            if (IsDisposed) return;
 
             if (disposing)
             {
@@ -114,7 +114,7 @@ namespace RabbitMqWrapper.Connection
                     _connection.Dispose();
             }
 
-            isDisposed = true;
+            IsDisposed = true;
         }
     }
 }

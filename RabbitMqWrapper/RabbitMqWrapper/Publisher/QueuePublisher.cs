@@ -1,10 +1,13 @@
 ﻿using CommonUtils.Serializer;
+using CommonUtils.Validation;
 using log4net;
 using RabbitMQ.Client;
 using RabbitMqWrapper.Configuration;
 using RabbitMqWrapper.Connection;
 using RabbitMqWrapper.Factories;
+using RabbitMqWrapper.Properties;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,6 +19,7 @@ namespace RabbitMqWrapper.Publisher
         private readonly ILog _logger = LogManager.GetLogger(typeof(QueuePublisher<>));
         private readonly IQueueConnectionFactory _connectionFactory;
         private readonly IJsonSerializer _serializer;
+        private readonly IValidationHelper _validationHelper;
         private readonly string _publisherName;
         private readonly IPublisherConfiguration _publisherConfig;
         private readonly CancellationToken _cancellationToken;
@@ -27,6 +31,7 @@ namespace RabbitMqWrapper.Publisher
         public QueuePublisher(IQueueConfiguration queueConfiguration,
                               IQueueConnectionFactory connectionFactory,
                               IJsonSerializer serializer,
+                              IValidationHelper validationHelper,
                               string publisherName,
                               CancellationToken cancellationToken)
         {
@@ -39,6 +44,7 @@ namespace RabbitMqWrapper.Publisher
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _publisherName = publisherName ?? throw new ArgumentNullException(nameof(publisherName));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _validationHelper = validationHelper ?? throw new ArgumentNullException(nameof(validationHelper));
             _cancellationToken = cancellationToken;
 
             // retrieve the specific queues configuration
@@ -48,29 +54,57 @@ namespace RabbitMqWrapper.Publisher
                 throw new ArgumentNullException(nameof(_publisherConfig));
         }
 
-        public void Publish(T message, string routingKey = null)
+        public void Publish(T message)
         {
-            // TODO connection persistence, stop lots of connections
+            Publish(message, null, null);
+        }
+
+        public void Publish(T message, string dynamicRoutingKey)
+        {
+            Publish(message, null, dynamicRoutingKey);
+        }
+
+        public void Publish(T message, IDictionary<string, object> headers)
+        {
+            Publish(message, headers, null);
+        }
+
+        public void Publish(T message, IDictionary<string, object> headers, string dynamicRoutingKey)
+        {
             try
             {
-                if (!_connected)
+                if (message == null)
+                    throw new ArgumentNullException(nameof(message));
+
+                // Validate message
+                _validationHelper.Validate(message);
+
+                // serialise object...
+                string messageBody = _serializer.SerializeObject(message);
+
+                // Determine routing key
+                var routingKey = dynamicRoutingKey ?? _publisherConfig.RoutingKey;
+
+                _logger.DebugFormat(Resources.PublishingMessageLogEntry, _publisherConfig.ExchangeName, routingKey, messageBody);
+
+                lock (_lock)
                 {
-                    _connection = _connectionFactory.CreateConnection(_publisherConfig.Name, _cancellationToken);
-
-                    _channel = _connection.CreateModel();
-
-                    lock (_lock)
+                    if (!_connected)
                     {
+                        _connection = _connectionFactory.CreateConnection(_publisherConfig.Name, _cancellationToken);
+
+                        _channel = _connection.CreateModel();
+
                         _connected = true;
+
                     }
                 }
 
-                var body = Encoding.UTF8.GetBytes(_serializer.SerializeObject(message));
-
                 _channel.BasicPublish(exchange: _publisherConfig.ExchangeName,
-                                     routingKey: !string.IsNullOrEmpty(routingKey) ? routingKey : _publisherConfig.RoutingKey,
+                                     routingKey: routingKey,
                                      basicProperties: null,
-                                     body: body);
+                                     body: Encoding.UTF8.GetBytes(messageBody));
+
                 _logger.Info($"Sent message");
 
             }
