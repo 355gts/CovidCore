@@ -17,18 +17,25 @@
     msg: "{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
-- template:
+- name: Template the Appsettings files
+  template:
     src: "{{ item.path }}"
     dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
-#- name: Test the OC connection
-#  k8s_info:
+- name: Get a list of settings files to push into Openshift
+  find: 
+    paths: ./config/
+  register: appsettings_files
+- debug:
+    msg: "{{ appsettings_files }}"
+# - name: Apply the config to a ConfigMap in Openshift
+#  k8s:
 #    api_version: v1
-#    kind: Service
+#    kind: ConfigMap
 #    namespace: covid
 #    host: https://api.ca-central-1.starter.openshift-online.com:6443
 #    api_key: ze47el0h0BwmD1zQklcgtF6HvC_atD27kuoPePERSLU
-#  register: service_list
-#- debug:
-#    msg: "{{ service_list }}"    
+#    apply:  yes
+#    name: 
+#  register: service_list 
