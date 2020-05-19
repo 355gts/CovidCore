@@ -7,12 +7,10 @@
 - name: Get the config files
   find:
     paths: /home/ec2-user/CovidCore/
-    patterns: "appsettings*.json"
+    patterns: "appsettings.Template.json"
     use_regex: yes
     recurse: yes
   register: config_files
-- set_fact:
-    regex_filter: "^.*\\/(Covid.*)\\/appsettings\\.json"
 - debug:
     msg: "{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
@@ -29,13 +27,8 @@
   register: appsettings_files
 - debug:
     msg: "{{ appsettings_files }}"
-# - name: Apply the config to a ConfigMap in Openshift
-#  k8s:
-#    api_version: v1
-#    kind: ConfigMap
-#    namespace: covid
-#    host: https://api.ca-central-1.starter.openshift-online.com:6443
-#    api_key: ze47el0h0BwmD1zQklcgtF6HvC_atD27kuoPePERSLU
-#    apply:  yes
-#    name: 
-#  register: service_list 
+- name: Apply the ConfigMaps
+  include: config_map.yaml config_file_path={{ item.path }}    
+  with_items:
+    - "{{ appsettings_files.files }}"        
+
