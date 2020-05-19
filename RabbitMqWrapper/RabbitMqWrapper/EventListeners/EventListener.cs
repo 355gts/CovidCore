@@ -1,20 +1,28 @@
 ﻿using log4net;
 using RabbitMqWrapper.Consumer;
+using RabbitMqWrapper.Enumerations;
 using System;
 using System.Threading.Tasks;
 
-namespace RabbitMqWrapper
+namespace RabbitMqWrapper.EventListeners
 {
     public abstract class EventListener<T> where T : class
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(EventListener<>));
 
-        private readonly QueueConsumer<T> _queueConsumer;
+        private readonly IQueueConsumer<T> _queueConsumer;
+        private readonly string performanceLoggingMethodName;
 
-        public EventListener(QueueConsumer<T> queueConsumer)
+        public EventListener(IQueueConsumer<T> queueConsumer)
         {
             _queueConsumer = queueConsumer ?? throw new ArgumentNullException(nameof(queueConsumer));
+            this.performanceLoggingMethodName = GetType().Name + "." + nameof(ProcessMessageAsync);
         }
+
+        /// <summary>
+        /// The message acknowledgement strategy for this Event Listener.
+        /// </summary>
+        protected virtual AcknowledgeBehaviour Behaviour => AcknowledgeBehaviour.AfterProcess;
 
         public abstract Task ProcessMessageAsync(T message, ulong deliveryTag, string routingKey = null);
 

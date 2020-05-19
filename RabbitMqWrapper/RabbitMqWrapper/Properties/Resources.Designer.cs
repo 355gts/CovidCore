@@ -68,5 +68,50 @@ namespace RabbitMqWrapper.Properties {
                 return ResourceManager.GetString("CouldNotFindCertificateError", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A fatal error occurred. Shutting down..
+        /// </summary>
+        internal static string FatalErrorLogEntry {
+            get {
+                return ResourceManager.GetString("FatalErrorLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid message received with delivery tag &apos;{0}&apos; from queue &apos;{1}&apos;. Validation errors: {2}..
+        /// </summary>
+        internal static string MessageFailsValidationLogEntry {
+            get {
+                return ResourceManager.GetString("MessageFailsValidationLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message with delivery tag &apos;{0}&apos; has been successfully processed..
+        /// </summary>
+        internal static string MessageProcessedLogEntry {
+            get {
+                return ResourceManager.GetString("MessageProcessedLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A message with delivery tag &apos;{0}&apos; has been received. Processing....
+        /// </summary>
+        internal static string MessageReceivedLogEntry {
+            get {
+                return ResourceManager.GetString("MessageReceivedLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message with delivery tag &apos;{0}&apos; failed to be processed. {1}.
+        /// </summary>
+        internal static string ProcessingErrorLogEntry {
+            get {
+                return ResourceManager.GetString("ProcessingErrorLogEntry", resourceCulture);
+            }
+        }
     }
 }

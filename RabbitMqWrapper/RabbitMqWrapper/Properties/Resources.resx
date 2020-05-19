@@ -120,4 +120,19 @@
   <data name="CouldNotFindCertificateError" xml:space="preserve">
     <value>Could not find unique certificate with subject name '{0}'. (Found {1} certificates).</value>
   </data>
+  <data name="FatalErrorLogEntry" xml:space="preserve">
+    <value>A fatal error occurred. Shutting down.</value>
+  </data>
+  <data name="MessageFailsValidationLogEntry" xml:space="preserve">
+    <value>Invalid message received with delivery tag '{0}' from queue '{1}'. Validation errors: {2}.</value>
+  </data>
+  <data name="MessageProcessedLogEntry" xml:space="preserve">
+    <value>Message with delivery tag '{0}' has been successfully processed.</value>
+  </data>
+  <data name="MessageReceivedLogEntry" xml:space="preserve">
+    <value>A message with delivery tag '{0}' has been received. Processing...</value>
+  </data>
+  <data name="ProcessingErrorLogEntry" xml:space="preserve">
+    <value>Message with delivery tag '{0}' failed to be processed. {1}</value>
+  </data>
 </root>

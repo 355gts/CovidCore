@@ -1,8 +1,10 @@
 using log4net;
 using log4net.Repository;
+using log4net.Repository.Hierarchy;
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Reflection;
 using static CommonUtils.Properties.Resources;
 
 namespace CommonUtils.Logging
@@ -35,6 +37,12 @@ namespace CommonUtils.Logging
                 throw new ArgumentNullException(nameof(uri));
 
             this.methodName = httpMethod.Method + " " + uri.AbsoluteUri;
+        }
+
+        public PerformanceLogger(string methodName)
+            : this(LogManager.CreateRepository(Assembly.GetEntryAssembly(), typeof(Hierarchy)))
+        {
+            this.methodName = methodName;
         }
 
         public PerformanceLogger(ILoggerRepository loggerRepository, string methodName)

@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace RabbitMqWrapper.Publisher
 {
-    public sealed class QueuePublisher<T> where T : class
+    public sealed class QueuePublisher<T> : IQueuePublisher<T> where T : class
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(QueuePublisher<>));
         private readonly IQueueConnectionFactory _connectionFactory;

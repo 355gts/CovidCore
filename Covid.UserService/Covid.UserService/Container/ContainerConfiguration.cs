@@ -2,6 +2,7 @@
 using CommonUtils.Certificates;
 using CommonUtils.Logging.Configuration;
 using CommonUtils.Serializer;
+using CommonUtils.Validation;
 using Covid.Common.Extensions;
 using Covid.Common.HttpClientHelper;
 using Covid.Common.HttpClientHelper.Configuration;
@@ -56,6 +57,7 @@ namespace Covid.UserService.Container
             // register types
             containerBuilder.RegisterType<HttpClientHelper>().As<IHttpClientHelper>().WithParameter("serviceName", "covid").SingleInstance();
             containerBuilder.RegisterType<HttpClientFactory>().As<IHttpClientFactory>().SingleInstance();
+            containerBuilder.RegisterType<ValidationHelper>().As<IValidationHelper>().SingleInstance();
             containerBuilder.RegisterType<CertificateHelper>().As<ICertificateHelper>().SingleInstance();
             containerBuilder.RegisterType<CovidApiHelper>().As<ICovidApiHelper>().SingleInstance();
             containerBuilder.RegisterType<JsonSerializer>().As<IJsonSerializer>().SingleInstance();
