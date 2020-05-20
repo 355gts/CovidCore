@@ -14,6 +14,7 @@ namespace RabbitMqWrapper.Extensions
                 throw new ArgumentNullException(nameof(consumerName));
 
             containerBuilder.RegisterType<QueueConsumer<TMessageType>>()
+                            .As<IQueueConsumer<TMessageType>>()
                             .WithParameter("consumerName", consumerName)
                             .WithParameter("cancellationToken", cancellationToken)
                             .SingleInstance();
@@ -27,7 +28,21 @@ namespace RabbitMqWrapper.Extensions
                 throw new ArgumentNullException(nameof(publisherName));
 
             containerBuilder.RegisterType<QueuePublisher<TMessageType>>()
+                            .As<IQueuePublisher<TMessageType>>()
                             .WithParameter("publisherName", publisherName)
+                            .WithParameter("cancellationToken", cancellationToken)
+                            .SingleInstance();
+
+            return containerBuilder;
+        }
+        public static ContainerBuilder RegisterSequentialQueueConsumer<TMessageType>(this ContainerBuilder containerBuilder, string consumerName, CancellationToken cancellationToken) where TMessageType : class
+        {
+            if (string.IsNullOrEmpty(consumerName))
+                throw new ArgumentNullException(nameof(consumerName));
+
+            containerBuilder.RegisterType<SequentialQueueConsumer<TMessageType>>()
+                            .As<ISequentialQueueConsumer<TMessageType>>()
+                            .WithParameter("consumerName", consumerName)
                             .WithParameter("cancellationToken", cancellationToken)
                             .SingleInstance();
 

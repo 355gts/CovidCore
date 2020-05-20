@@ -38,6 +38,8 @@ namespace Covid.UserService
 
                 var userEventListener = scope.Resolve<UserEventListener>();
                 _tasks.Add(userEventListener.Run());
+                var userSequentialEventListener = scope.Resolve<UserSequentialEventListener>();
+                _tasks.Add(userSequentialEventListener.Run());
 
                 _logger.Info($"Started service '{nameof(UserService)}'");
             }

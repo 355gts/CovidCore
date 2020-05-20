@@ -67,8 +67,10 @@ namespace Covid.UserService.Container
             containerBuilder.RegisterType<MessagePublisher>().As<IMessagePublisher>().SingleInstance();
             containerBuilder.Register(ctx => { return new Mapper(executingAssembly); }).As<IMapper>().SingleInstance();
             containerBuilder.RegisterType<UserEventListener>();
+            containerBuilder.RegisterType<UserSequentialEventListener>();
 
             containerBuilder.RegisterQueueConsumer<CreateUser>("NewUserQueueConsumer", cancellationTokenSource.Token);
+            containerBuilder.RegisterSequentialQueueConsumer<CreateUser2>("NewSequentialUserQueueConsumer", cancellationTokenSource.Token);
             containerBuilder.RegisterQueuePublisher<User>("NewUserQueuePublisher", cancellationTokenSource.Token);
 
             return containerBuilder.Build();

@@ -61,6 +61,24 @@ namespace RabbitMqWrapper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find consumer with name &apos;{0}&apos; in application configuration file..
+        /// </summary>
+        internal static string ConsumerNameNotFoundError {
+            get {
+                return ResourceManager.GetString("ConsumerNameNotFoundError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Started consuming from queue &apos;{0}&apos; with RabbitMQ consumer tag &apos;{1}&apos;..
+        /// </summary>
+        internal static string ConsumptionStartedLogEntry {
+            get {
+                return ResourceManager.GetString("ConsumptionStartedLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find unique certificate with subject name &apos;{0}&apos;. (Found {1} certificates)..
         /// </summary>
         internal static string CouldNotFindCertificateError {

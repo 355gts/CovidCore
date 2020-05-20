@@ -64,10 +64,10 @@ namespace RabbitMqWrapper.Consumer
             if (_consumerConfig == null)
                 throw new ArgumentNullException(nameof(_consumerConfig));
 
-            this.performanceLoggingMethodName = GetType().Name + "." + nameof(Consume);
+            this.performanceLoggingMethodName = GetType().Name + "." + nameof(Run);
         }
 
-        public void Consume(Func<T, ulong, string, Task> onMessage)
+        public void Run(Func<T, ulong, CancellationToken, string, Task> onMessage)
         {
             try
             {
@@ -93,8 +93,8 @@ namespace RabbitMqWrapper.Consumer
                                 {
                                     var message = _serializer.Deserialize<T>(Encoding.UTF8.GetString(body));
 
-                                // Validate object
-                                string validationErrors;
+                                    // Validate object
+                                    string validationErrors;
                                     bool success = _validationHelper.TryValidate(message, out validationErrors);
                                     if (!success)
                                     {
@@ -109,7 +109,7 @@ namespace RabbitMqWrapper.Consumer
                                     if (Behaviour == AcknowledgeBehaviour.BeforeProcess)
                                         _channel.BasicAck(deliveryTag, false);
 
-                                    await onMessage(message, deliveryTag, routingKey);
+                                    await onMessage(message, deliveryTag, _cancellationToken, routingKey);
 
                                     if (Behaviour == AcknowledgeBehaviour.AfterProcess)
                                         _channel.BasicAck(deliveryTag, false);
