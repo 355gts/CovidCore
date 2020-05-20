@@ -84,9 +84,9 @@ objects:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-          - mountPath: /opt/app-root/app/appsettings.json
-            name: covid-userservice-configmap
-            subPath: appsettings.json
+          - mountPath: /opt/app-root/app/appsettings.Production.json
+            name: covid-userservice
+            subPath: appsettings.Production.json
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -95,8 +95,8 @@ objects:
         volumes:
         - configMap:
             defaultMode: 420
-            name: covid-userservice-configmap
-          name: covid-userservice-configmap
+            name: covid.userservice
+          name: covid-userservice
     test: false
     triggers:
     - type: ConfigChange
@@ -247,7 +247,7 @@ objects:
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /opt/app-root/app/appsettings.Production.json
-            name: covid-api-configmap
+            name: covid-api
             subPath: appsettings.Production.json
         dnsPolicy: ClusterFirst
         restartPolicy: Always
@@ -257,8 +257,8 @@ objects:
         volumes:
         - configMap:
             defaultMode: 420
-            name: covid-api-configmap
-          name: covid-api-configmap
+            name: covid.api
+          name: covid-api
     test: false
     triggers:
     - type: ConfigChange
