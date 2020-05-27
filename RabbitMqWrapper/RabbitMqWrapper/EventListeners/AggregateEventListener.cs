@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RabbitMqWrapper.EventListeners
 {
-    public abstract class EventListener<T> where T : class
+    public abstract class AggregateEventListener<TMessage, TGroup> where TMessage : class where TGroup : struct
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(EventListener<>));
 

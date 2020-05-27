@@ -18,8 +18,6 @@ namespace RabbitMqWrapper.EventListeners
         {
             _queueConsumer = queueConsumer ?? throw new ArgumentNullException(nameof(queueConsumer));
             this.performanceLoggingMethodName = GetType().Name + "." + nameof(ProcessMessageAsync);
-
-
         }
 
         /// <summary>
@@ -27,7 +25,7 @@ namespace RabbitMqWrapper.EventListeners
         /// </summary>
         protected virtual AcknowledgeBehaviour Behaviour => AcknowledgeBehaviour.AfterProcess;
 
-        public abstract Task ProcessMessageAsync(T message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null);
+        protected abstract Task ProcessMessageAsync(T message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null);
 
         public async Task Run()
         {

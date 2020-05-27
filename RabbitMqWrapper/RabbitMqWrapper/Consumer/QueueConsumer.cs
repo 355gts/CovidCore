@@ -45,7 +45,7 @@ namespace RabbitMqWrapper.Consumer
                              IJsonSerializer serializer,
                              IValidationHelper validationHelper,
                              string consumerName,
-                              CancellationToken cancellationToken)
+                             CancellationToken cancellationToken)
         {
             _queueConfiguration = queueConfiguration ?? throw new ArgumentNullException(nameof(queueConfiguration));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
