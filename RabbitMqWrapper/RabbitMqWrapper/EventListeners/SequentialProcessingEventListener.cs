@@ -1,22 +1,56 @@
-﻿using log4net;
+﻿using CommonUtils.Exceptions;
+using CommonUtils.Logging;
+using CommonUtils.Serializer;
+using CommonUtils.Threading;
+using CommonUtils.Validation;
+using log4net;
 using RabbitMqWrapper.Consumer;
 using RabbitMqWrapper.Enumerations;
+using RabbitMqWrapper.Model;
+using RabbitMqWrapper.Properties;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace RabbitMqWrapper.EventListeners
 {
-    public abstract class SequentialProcessingEventListener<T> where T : class
+    public abstract class SequentialProcessingEventListener<TMessage> : IEventListener where TMessage : class
     {
+        private sealed class ProcessingQueue
+        {
+            public ConcurrentQueue<QueueMessage<TMessage>> Queue { get; set; }
+
+            public AutoResetEventAsync AutoResetEvent { get; set; }
+
+            public ProcessingQueue()
+            {
+                Queue = new ConcurrentQueue<QueueMessage<TMessage>>();
+                AutoResetEvent = new AutoResetEventAsync();
+            }
+        }
+
         private readonly ILog _logger = LogManager.GetLogger(typeof(SequentialProcessingEventListener<>));
 
-        private readonly ISequentialQueueConsumer<T> _queueConsumer;
+        private readonly IQueueConsumer<TMessage> _queueConsumer;
+        protected readonly IJsonSerializer _serializer;
+        protected readonly IValidationHelper _validationHelper;
         private readonly string performanceLoggingMethodName;
+        private readonly Dictionary<string, ProcessingQueue> processingQueues;
+        private readonly List<Task> tasks;
 
-        public SequentialProcessingEventListener(ISequentialQueueConsumer<T> queueConsumer)
+        public SequentialProcessingEventListener(
+            IQueueConsumer<TMessage> queueConsumer,
+            IJsonSerializer serializer,
+            IValidationHelper validationHelper)
         {
             _queueConsumer = queueConsumer ?? throw new ArgumentNullException(nameof(queueConsumer));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _validationHelper = validationHelper ?? throw new ArgumentNullException(nameof(validationHelper));
+            processingQueues = new Dictionary<string, ProcessingQueue>();
+            tasks = new List<Task>();
             this.performanceLoggingMethodName = GetType().Name + "." + nameof(ProcessMessageAsync);
         }
 
@@ -25,12 +59,127 @@ namespace RabbitMqWrapper.EventListeners
         /// </summary>
         protected virtual AcknowledgeBehaviour Behaviour => AcknowledgeBehaviour.AfterProcess;
 
-        protected abstract Task ProcessMessageAsync(T message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null);
-
-        public async Task Run()
+        protected virtual string GetProcessingSequenceIdentifier(string routingKey)
         {
+            if (string.IsNullOrWhiteSpace(routingKey))
+                throw new ArgumentNullException(nameof(routingKey));
+
+            string[] routingKeyParts = routingKey.Split('.');
+            return routingKeyParts[0];
+        }
+
+        protected abstract Task ProcessMessageAsync(TMessage message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null);
+
+        private async Task MessageReceivedAsync(QueueMessage<TMessage> message, CancellationToken cancellationToken)
+        {
+            //while (!cancellationToken.IsCancellationRequested && !tasks.Any(t => t.IsFaulted))
+            //{
+            if (Behaviour == AcknowledgeBehaviour.BeforeProcess)
+                _queueConsumer.AcknowledgeMessage(message.DeliveryTag);
+
+            string processingSequenceIdentifier = GetProcessingSequenceIdentifier(message.RoutingKey);
+
+            if (processingQueues.ContainsKey(processingSequenceIdentifier))
+            {
+                // Add a message to the processing queue, and signal the processing thread to alert it to the new message.
+                var processingQueue = processingQueues[processingSequenceIdentifier];
+                processingQueue.Queue.Enqueue(message);
+                processingQueue.AutoResetEvent.Set();
+            }
+            else
+            {
+                // create a new processing queue and kick off a task to process it.
+                var processingQueue = new ProcessingQueue();
+                processingQueue.Queue.Enqueue(message);
+                processingQueues[processingSequenceIdentifier] = processingQueue;
+                var t = Task.Run(RunSequentialProcessor(processingQueue, cancellationToken));
+                tasks.Add(t);
+            }
+
+            Console.WriteLine($"Received new message {message.DeliveryTag}, processor queue length {processingQueues.First().Value.Queue.Count()}");
+
+            // Remove completed queues
+            var processingQueuesToRemove = new List<string>();
+            foreach (var processingQueue in processingQueues)
+            {
+                if (!processingQueue.Value.Queue.Any())
+                {
+                    processingQueue.Value.AutoResetEvent.Set();
+                    processingQueuesToRemove.Add(processingQueue.Key);
+                }
+            }
+
+            foreach (var processingQueueToRemove in processingQueuesToRemove)
+            {
+                processingQueues.Remove(processingQueueToRemove);
+            }
+
+            // Remove completed tasks
+            tasks.RemoveAll(x => x.IsCompleted);
+            //}
+            // Exit all processing threads
+            foreach (var processingQueue in processingQueues.Values)
+            {
+                processingQueue.AutoResetEvent.Set();
+            }
+
+            Task.WaitAll(tasks.ToArray());
+
+        }
+
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        private Func<Task> RunSequentialProcessor(ProcessingQueue processingQueue, CancellationToken cancellationToken)
+        {
+            return async () =>
+            {
+                QueueMessage<TMessage> dequeuedMessage;
+                while (!cancellationToken.IsCancellationRequested && processingQueue.Queue.TryPeek(out dequeuedMessage))
+                {
+                    using (var performanceLogger = new PerformanceLogger(performanceLoggingMethodName))
+                    {
+                        _logger.DebugFormat(Resources.MessageReceivedLogEntry, dequeuedMessage.DeliveryTag);
+
+                        try
+                        {
+                            await ProcessMessageAsync(
+                                dequeuedMessage.Message,
+                                dequeuedMessage.DeliveryTag,
+                                cancellationToken,
+                                dequeuedMessage.RoutingKey);
+
+                            if (Behaviour != AcknowledgeBehaviour.Async)
+                                _queueConsumer.AcknowledgeMessage(dequeuedMessage.DeliveryTag);
+
+                            _logger.InfoFormat(Resources.MessageProcessedLogEntry, dequeuedMessage.DeliveryTag);
+                        }
+                        catch (FatalErrorException e)
+                        {
+                            _logger.Fatal(Resources.FatalErrorLogEntry, e);
+                            _queueConsumer.NegativelyAcknowledgeAndRequeue(dequeuedMessage.DeliveryTag);
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.ErrorFormat(Resources.ProcessingErrorLogEntry, dequeuedMessage.DeliveryTag, e);
+                            _queueConsumer.NegativelyAcknowledge(dequeuedMessage.DeliveryTag);
+                        }
+                    }
+
+                    // we have finished processing - remove the message from the queue and wait for the next one.
+                    processingQueue.Queue.TryDequeue(out dequeuedMessage);
+                    await processingQueue.AutoResetEvent.WaitOneAsync();
+                }
+            };
+        }
+
+        public void Run(CancellationToken cancellationToken)
+        {
+            if (cancellationToken == null)
+                throw new ArgumentNullException(nameof(cancellationToken));
+
             // tell the consumer to start listening and then pass it the process message action to perform
-            _queueConsumer.Run(ProcessMessageAsync);
+            _queueConsumer.Run(MessageReceivedAsync, cancellationToken);
         }
     }
 }

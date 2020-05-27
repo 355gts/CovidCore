@@ -36,10 +36,10 @@ namespace Covid.UserService
 
                 _logger.Info($"Starting service '{nameof(UserService)}'");
 
-                var userEventListener = scope.Resolve<UserEventListener>();
-                _tasks.Add(userEventListener.Run());
+                //var userEventListener = scope.Resolve<UserEventListener>();
+                //_tasks.Add(Task.Factory.StartNew(() => userEventListener.Run(_eventListenerCancellationTokenSource.Token)));
                 var userSequentialEventListener = scope.Resolve<UserSequentialEventListener>();
-                _tasks.Add(userSequentialEventListener.Run());
+                _tasks.Add(Task.Factory.StartNew(() => userSequentialEventListener.Run(_eventListenerCancellationTokenSource.Token)));
 
                 _logger.Info($"Started service '{nameof(UserService)}'");
             }

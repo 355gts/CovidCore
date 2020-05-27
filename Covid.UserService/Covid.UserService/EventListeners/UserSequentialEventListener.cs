@@ -1,4 +1,6 @@
-﻿using Covid.Common.HttpClientHelper;
+﻿using CommonUtils.Serializer;
+using CommonUtils.Validation;
+using Covid.Common.HttpClientHelper;
 using Covid.Common.Mapper;
 using Covid.Message.Model.Publisher;
 using Covid.Message.Model.Users;
@@ -6,6 +8,7 @@ using log4net;
 using RabbitMqWrapper.Consumer;
 using RabbitMqWrapper.EventListeners;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dom = Covid.Web.Model.Users;
@@ -20,19 +23,28 @@ namespace Covid.UserService.EventListeners
         private readonly ICovidApiHelper _covidApiHelper;
 
         public UserSequentialEventListener(
-            ISequentialQueueConsumer<CreateUser2> userQueueConsumer,
+            IQueueConsumer<CreateUser2> userQueueConsumer,
+            IJsonSerializer serializer,
+            IValidationHelper validationHelper,
             IMessagePublisher messagePublisher,
             IMapper mapper,
             ICovidApiHelper covidApiHelper)
-            : base(userQueueConsumer)
+            : base(userQueueConsumer, serializer, validationHelper)
         {
             _messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _covidApiHelper = covidApiHelper ?? throw new ArgumentNullException(nameof(covidApiHelper));
         }
 
-        public override async Task ProcessMessageAsync(CreateUser2 message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null)
+        protected override string GetProcessingSequenceIdentifier(string routingKey)
         {
+            return routingKey.Split('.').Skip(1).First();
+        }
+
+        protected override async Task ProcessMessageAsync(CreateUser2 message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null)
+        {
+            await Task.Delay(10000);
+
             var newUser = _mapper.Map<CreateUser, Dom.CreateUser>(message);
 
             var result = await _covidApiHelper.Users.CreateUserAsync(newUser);

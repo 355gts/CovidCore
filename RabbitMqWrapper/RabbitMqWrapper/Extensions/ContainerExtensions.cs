@@ -35,18 +35,5 @@ namespace RabbitMqWrapper.Extensions
 
             return containerBuilder;
         }
-        public static ContainerBuilder RegisterSequentialQueueConsumer<TMessageType>(this ContainerBuilder containerBuilder, string consumerName, CancellationToken cancellationToken) where TMessageType : class
-        {
-            if (string.IsNullOrEmpty(consumerName))
-                throw new ArgumentNullException(nameof(consumerName));
-
-            containerBuilder.RegisterType<SequentialQueueConsumer<TMessageType>>()
-                            .As<ISequentialQueueConsumer<TMessageType>>()
-                            .WithParameter("consumerName", consumerName)
-                            .WithParameter("cancellationToken", cancellationToken)
-                            .SingleInstance();
-
-            return containerBuilder;
-        }
     }
 }

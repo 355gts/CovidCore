@@ -1,4 +1,6 @@
-﻿using Covid.Common.HttpClientHelper;
+﻿using CommonUtils.Serializer;
+using CommonUtils.Validation;
+using Covid.Common.HttpClientHelper;
 using Covid.Common.Mapper;
 using Covid.Message.Model.Publisher;
 using Covid.Message.Model.Users;
@@ -23,15 +25,17 @@ namespace Covid.UserService.EventListeners
             IQueueConsumer<CreateUser> userQueueConsumer,
             IMessagePublisher messagePublisher,
             IMapper mapper,
-            ICovidApiHelper covidApiHelper)
-            : base(userQueueConsumer)
+            ICovidApiHelper covidApiHelper,
+            IJsonSerializer serializer,
+            IValidationHelper validationHelper)
+            : base(userQueueConsumer, serializer, validationHelper)
         {
             _messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _covidApiHelper = covidApiHelper ?? throw new ArgumentNullException(nameof(covidApiHelper));
         }
 
-        public override async Task ProcessMessageAsync(CreateUser message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null)
+        protected override async Task ProcessMessageAsync(CreateUser message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null)
         {
             var newUser = _mapper.Map<CreateUser, Dom.CreateUser>(message);
 

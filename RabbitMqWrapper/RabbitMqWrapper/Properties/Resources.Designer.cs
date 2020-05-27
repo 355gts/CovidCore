@@ -124,6 +124,15 @@ namespace RabbitMqWrapper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully deserialized and validated message with delivery tag &apos;{0}&apos; from queue &apos;{1}&apos;..
+        /// </summary>
+        internal static string MessageSuccessfullyReceivedLogEntry {
+            get {
+                return ResourceManager.GetString("MessageSuccessfullyReceivedLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Message with delivery tag &apos;{0}&apos; failed to be processed. {1}.
         /// </summary>
         internal static string ProcessingErrorLogEntry {
@@ -138,6 +147,15 @@ namespace RabbitMqWrapper.Properties {
         internal static string PublishingMessageLogEntry {
             get {
                 return ResourceManager.GetString("PublishingMessageLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unknown error occurred when trying to create a temporary queue..
+        /// </summary>
+        internal static string TemporaryQueueCreationError {
+            get {
+                return ResourceManager.GetString("TemporaryQueueCreationError", resourceCulture);
             }
         }
     }

@@ -138,10 +138,16 @@
   <data name="MessageReceivedLogEntry" xml:space="preserve">
     <value>A message with delivery tag '{0}' has been received. Processing...</value>
   </data>
+  <data name="MessageSuccessfullyReceivedLogEntry" xml:space="preserve">
+    <value>Successfully deserialized and validated message with delivery tag '{0}' from queue '{1}'.</value>
+  </data>
   <data name="ProcessingErrorLogEntry" xml:space="preserve">
     <value>Message with delivery tag '{0}' failed to be processed. {1}</value>
   </data>
   <data name="PublishingMessageLogEntry" xml:space="preserve">
     <value>Publishing message to exchange '{0}' with routing key '{1}': {2}</value>
+  </data>
+  <data name="TemporaryQueueCreationError" xml:space="preserve">
+    <value>An unknown error occurred when trying to create a temporary queue.</value>
   </data>
 </root>
