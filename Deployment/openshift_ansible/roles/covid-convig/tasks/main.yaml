@@ -7,7 +7,7 @@
   become: true
 - name: Make a directory for the source
   file:
-    path: ./src
+    path: ~/src
     state: directory
 - name: Get the latest source code from github
   git:
@@ -30,7 +30,7 @@
     - "{{ config_files.files }}"
 - name: Template the Appsettings files
   template:
-    src: "{{ item.path }}"
+    src: "~/{{ item.path }}"
     dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
