@@ -30,7 +30,11 @@
     - "{{ config_files.files }}"
 - name: Template the Appsettings files
   template:
+<<<<<<< HEAD
     src: "~/{{ item.path }}"
+=======
+    src: "./{{ item.path }}"
+>>>>>>> 1699edd74d1b0a53c7db89c0ba41ebf253199fc8
     dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
