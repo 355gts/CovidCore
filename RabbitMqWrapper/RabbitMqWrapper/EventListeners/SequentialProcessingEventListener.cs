@@ -38,8 +38,8 @@ namespace RabbitMqWrapper.EventListeners
         protected readonly IJsonSerializer _serializer;
         protected readonly IValidationHelper _validationHelper;
         private readonly string performanceLoggingMethodName;
-        private readonly Dictionary<string, ProcessingQueue> processingQueues;
-        private readonly List<Task> tasks;
+        private readonly ConcurrentDictionary<string, ProcessingQueue> processingQueues;
+        private ConcurrentDictionary<string, Task> tasks;
 
         public SequentialProcessingEventListener(
             IQueueConsumer<TMessage> queueConsumer,
@@ -49,8 +49,8 @@ namespace RabbitMqWrapper.EventListeners
             _queueConsumer = queueConsumer ?? throw new ArgumentNullException(nameof(queueConsumer));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _validationHelper = validationHelper ?? throw new ArgumentNullException(nameof(validationHelper));
-            processingQueues = new Dictionary<string, ProcessingQueue>();
-            tasks = new List<Task>();
+            processingQueues = new ConcurrentDictionary<string, ProcessingQueue>();
+            tasks = new ConcurrentDictionary<string, Task>();
             this.performanceLoggingMethodName = GetType().Name + "." + nameof(ProcessMessageAsync);
         }
 
@@ -72,31 +72,32 @@ namespace RabbitMqWrapper.EventListeners
 
         private async Task MessageReceivedAsync(QueueMessage<TMessage> message, CancellationToken cancellationToken)
         {
-            //while (!cancellationToken.IsCancellationRequested && !tasks.Any(t => t.IsFaulted))
-            //{
-            if (Behaviour == AcknowledgeBehaviour.BeforeProcess)
-                _queueConsumer.AcknowledgeMessage(message.DeliveryTag);
-
-            string processingSequenceIdentifier = GetProcessingSequenceIdentifier(message.RoutingKey);
-
-            if (processingQueues.ContainsKey(processingSequenceIdentifier))
+            if (!cancellationToken.IsCancellationRequested && !tasks.Any(t => t.Value.IsFaulted))
             {
-                // Add a message to the processing queue, and signal the processing thread to alert it to the new message.
-                var processingQueue = processingQueues[processingSequenceIdentifier];
-                processingQueue.Queue.Enqueue(message);
-                processingQueue.AutoResetEvent.Set();
-            }
-            else
-            {
-                // create a new processing queue and kick off a task to process it.
-                var processingQueue = new ProcessingQueue();
-                processingQueue.Queue.Enqueue(message);
-                processingQueues[processingSequenceIdentifier] = processingQueue;
-                var t = Task.Run(RunSequentialProcessor(processingQueue, cancellationToken));
-                tasks.Add(t);
-            }
+                if (Behaviour == AcknowledgeBehaviour.BeforeProcess)
+                    _queueConsumer.AcknowledgeMessage(message.DeliveryTag);
 
-            Console.WriteLine($"Received new message {message.DeliveryTag}, processor queue length {processingQueues.First().Value.Queue.Count()}");
+                string processingSequenceIdentifier = GetProcessingSequenceIdentifier(message.RoutingKey);
+
+                if (processingQueues.ContainsKey(processingSequenceIdentifier))
+                {
+                    // Add a message to the processing queue, and signal the processing thread to alert it to the new message.
+                    var processingQueue = processingQueues[processingSequenceIdentifier];
+                    processingQueue.Queue.Enqueue(message);
+                    processingQueue.AutoResetEvent.Set();
+                }
+                else
+                {
+                    // create a new processing queue and kick off a task to process it.
+                    var processingQueue = new ProcessingQueue();
+                    processingQueue.Queue.Enqueue(message);
+                    processingQueues[processingSequenceIdentifier] = processingQueue;
+                    var t = Task.Run(RunSequentialProcessor(processingQueue, cancellationToken));
+                    tasks.TryAdd(processingSequenceIdentifier, t);
+                }
+
+                _logger.Info($"Received new message {message.DeliveryTag}, processor queue length {processingQueues.First().Value.Queue.Count()}");
+            }
 
             // Remove completed queues
             var processingQueuesToRemove = new List<string>();
@@ -111,22 +112,14 @@ namespace RabbitMqWrapper.EventListeners
 
             foreach (var processingQueueToRemove in processingQueuesToRemove)
             {
-                processingQueues.Remove(processingQueueToRemove);
+                processingQueues.TryRemove(processingQueueToRemove, out _);
+                tasks.TryRemove(processingQueueToRemove, out _);
             }
 
-            // Remove completed tasks
-            tasks.RemoveAll(x => x.IsCompleted);
-            //}
-            // Exit all processing threads
-            foreach (var processingQueue in processingQueues.Values)
-            {
-                processingQueue.AutoResetEvent.Set();
-            }
+            // TODO: is it possible to remove executed tasks from the Task list and processingqueues from the processing queues
 
-            Task.WaitAll(tasks.ToArray());
-
+            _logger.Info($"Number of tasks {tasks.Count()}, number of queues {processingQueues.Count()}.");
         }
-
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private Func<Task> RunSequentialProcessor(ProcessingQueue processingQueue, CancellationToken cancellationToken)

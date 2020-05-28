@@ -43,8 +43,6 @@ namespace Covid.UserService.EventListeners
 
         protected override async Task ProcessMessageAsync(CreateUser2 message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null)
         {
-            await Task.Delay(10000);
-
             var newUser = _mapper.Map<CreateUser, Dom.CreateUser>(message);
 
             var result = await _covidApiHelper.Users.CreateUserAsync(newUser);
