@@ -1,5 +1,10 @@
 ---
 
+- name: Install the Openshift pip module
+  pip:
+    name: openshift
+    state: latest 
+  become: true
 - name: Make a directory for the config 
   file:
     path: ./config
@@ -11,10 +16,6 @@
     use_regex: yes
     recurse: yes
   register: config_files
-- debug:
-    msg: "{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
-  with_items:
-    - "{{ config_files.files }}"
 - name: Template the Appsettings files
   template:
     src: "{{ item.path }}"
@@ -25,8 +26,6 @@
   find: 
     paths: ./config/
   register: appsettings_files
-- debug:
-    msg: "{{ appsettings_files }}"
 - name: Apply the ConfigMaps
   include: config_map.yaml config_file_path={{ item.path }}    
   with_items:

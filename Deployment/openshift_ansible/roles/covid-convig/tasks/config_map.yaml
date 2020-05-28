@@ -5,8 +5,6 @@
   register: config_file
 - set_fact:
     config_file_decoded: "{{ config_file.content | b64decode }}"
-- debug:
-    msg: "{{ config_file_decoded }}"
 - name: Apply the configmap update
   k8s:
     state: present
