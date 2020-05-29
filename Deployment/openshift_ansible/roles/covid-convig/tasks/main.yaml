@@ -1,5 +1,7 @@
 ---
 
+- debug:
+    msg: "{{ ansible_version.full }}"
 - name: Install the Openshift pip module
   pip:
     name: openshift
