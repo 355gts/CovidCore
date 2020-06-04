@@ -56,7 +56,7 @@ namespace RabbitMQWrapper.EventListeners
                     if (Behaviour == AcknowledgeBehaviour.AfterProcess)
                         _queueConsumer.AcknowledgeMessage(message.DeliveryTag);
 
-                    if (Behaviour != AcknowledgeBehaviour.Never)
+                    if (Behaviour != AcknowledgeBehaviour.Never && Behaviour != AcknowledgeBehaviour.Deferred)
                         _logger.InfoFormat(Resources.MessageProcessedLogEntry, message.DeliveryTag);
                 }
                 catch (AlreadyClosedException ex)

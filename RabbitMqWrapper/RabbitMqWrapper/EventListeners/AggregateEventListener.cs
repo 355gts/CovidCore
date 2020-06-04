@@ -68,6 +68,7 @@ namespace RabbitMQWrapper.EventListeners
         #endregion
 
         #region Overrides
+        // set acknowledgement behaviour to never to acknowledgement is deferred until the messages are processed
         protected override AcknowledgeBehaviour Behaviour => AcknowledgeBehaviour.Never;
 
         protected override async Task ProcessMessageAsync(TMessage message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null)
@@ -76,57 +77,56 @@ namespace RabbitMQWrapper.EventListeners
             {
                 var group = await GetAggregationGroup(message);
 
-                if (group.Success)
+                if (!group.Success)
                 {
-                    lock (messageAggregatesLock)
+                    logger.Warn($"Failed to get group for message with delivery tag '{deliveryTag}'. This will not be aggregated.");
+                    return;
+                }
+
+                lock (messageAggregatesLock)
+                {
+                    if (!messageAggregateByGroup.ContainsKey(group.Group))
                     {
-                        if (!messageAggregateByGroup.ContainsKey(group.Group))
+                        // set up the max time
+                        DateTime maxFutureFireTime = DateTime.Now.AddTicks(MaxTimeoutTimeSpan.Ticks);
+                        if (MaxTimeoutTimeSpan.Ticks <= 0)
                         {
-                            // set up the max time
-                            DateTime maxFutureFireTime = DateTime.Now.AddTicks(MaxTimeoutTimeSpan.Ticks);
-                            if (MaxTimeoutTimeSpan.Ticks <= 0)
-                            {
-                                maxFutureFireTime = DateTime.MaxValue;
-                            }
+                            maxFutureFireTime = DateTime.MaxValue;
+                        }
 
-                            // set up the timer
-                            var timer = new Timer(o => ProcessAggregation(group.Group, cancellationToken), null, TimeoutTimeSpan, TimeoutTimeSpan);
+                        // set up the timer
+                        var timer = new Timer(o => ProcessAggregation(group.Group, cancellationToken), null, TimeoutTimeSpan, TimeoutTimeSpan);
 
-                            // set up the message list
-                            var messages = new Dictionary<ulong, TMessage>();
-                            messages.Add(deliveryTag, message);
+                        // set up the message list
+                        var messages = new Dictionary<ulong, TMessage>();
+                        messages.Add(deliveryTag, message);
 
-                            messageAggregateByGroup.Add(group.Group, new MessageAggregate<TMessage>
-                            {
-                                MaxTimeout = maxFutureFireTime,
-                                Timer = timer,
-                                Messages = messages
-                            });
+                        messageAggregateByGroup.Add(group.Group, new MessageAggregate<TMessage>
+                        {
+                            MaxTimeout = maxFutureFireTime,
+                            Timer = timer,
+                            Messages = messages
+                        });
 
-                            logger.Debug($"Adding new aggregation group '{group}' with timer set for {TimeoutTimeSpan} milliseconds from {DateTime.UtcNow.ToString()}");
+                        logger.Debug($"Adding new aggregation group '{group}' with timer set for {TimeoutTimeSpan} milliseconds from {DateTime.UtcNow.ToString()}");
+                    }
+                    else
+                    {
+                        // add the items to the existing group
+                        messageAggregateByGroup[group.Group].Messages.Add(deliveryTag, message);
+
+                        if (DateTime.Now < messageAggregateByGroup[group.Group].MaxTimeout)
+                        {
+                            messageAggregateByGroup[group.Group].Timer.Change(TimeoutTimeSpan, TimeoutTimeSpan);
+                            logger.Debug($"Added to aggregation group '{group}' with timer reset for {TimeoutTimeSpan} milliseconds from {DateTime.UtcNow.ToString()}");
                         }
                         else
                         {
-                            // add the items to the existing group
-                            messageAggregateByGroup[group.Group].Messages.Add(deliveryTag, message);
-
-                            if (DateTime.Now < messageAggregateByGroup[group.Group].MaxTimeout)
-                            {
-                                messageAggregateByGroup[group.Group].Timer.Change(TimeoutTimeSpan, TimeoutTimeSpan);
-                                logger.Debug($"Added to aggregation group '{group}' with timer reset for {TimeoutTimeSpan} milliseconds from {DateTime.UtcNow.ToString()}");
-                            }
-                            else
-                            {
-                                logger.Debug($"Maxtimeout reached for group '{group}'");
-                            }
+                            logger.Debug($"Maxtimeout reached for group '{group}'");
                         }
                     }
                 }
-                else
-                {
-                    _queueConsumer.AcknowledgeMessage(deliveryTag);
-                    logger.Warn($"Failed to get group for message with delivery tag '{deliveryTag}'. This will not be aggregated.");
-                }
+
             }
             else
             {
@@ -199,6 +199,9 @@ namespace RabbitMQWrapper.EventListeners
                         logger.Info($"Negatively Acknowledging message with delivery tag '{deliveryTag}'");
                     }
                 }
+
+
+                logger.Info($"Messages processed successfully.");
             }
             else
             {

@@ -14,7 +14,7 @@ using Dom = Covid.Web.Model.Users;
 
 namespace Covid.UserService.EventListeners
 {
-    public class UserEventListener : EventListener<CreateUser>
+    sealed class UserEventListener : EventListener<CreateUser>
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(UserEventListener));
         private readonly IMessagePublisher _messagePublisher;

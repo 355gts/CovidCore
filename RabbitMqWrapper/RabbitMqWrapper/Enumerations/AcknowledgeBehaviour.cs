@@ -21,5 +21,10 @@
         /// Acknowledge the message asynchronously
         /// </summary>
         Async,
+
+        /// <summary>
+        /// Acknowledgement of the message is deffered and handled by another component
+        /// </summary>
+        Deferred,
     }
 }
