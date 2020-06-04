@@ -77,45 +77,6 @@ namespace RabbitMQWrapper.Consumer
                     consumer.Received += async (model, rabbitMessage) =>
                     {
                         await ProcessMessageAsync(model, rabbitMessage, onMessageReceived, cancellationToken);
-                        //try
-                        //{
-                        //    // Deserialize object
-                        //    T messageObject = _serializer.Deserialize<T>(Encoding.UTF8.GetString(rabbitMessage.Body));
-
-                        //    // Validate object
-                        //    string validationErrors;
-                        //    bool success = _validationHelper.TryValidate(messageObject, out validationErrors);
-
-                        //    if (!success)
-                        //    {
-                        //        _logger.ErrorFormat(
-                        //            Resources.MessageFailsValidationLogEntry,
-                        //            rabbitMessage.DeliveryTag,
-                        //            queueName,
-                        //            validationErrors);
-                        //        NegativelyAcknowledge(rabbitMessage.DeliveryTag);
-                        //        return;
-                        //    }
-
-                        //    _logger.InfoFormat(Resources.MessageSuccessfullyReceivedLogEntry, rabbitMessage.DeliveryTag, queueName);
-                        //    var message = new QueueMessage<T>(messageObject,
-                        //        rabbitMessage.DeliveryTag,
-                        //        rabbitMessage.RoutingKey,
-                        //        rabbitMessage.BasicProperties.Headers);
-
-                        //    // call the event handler to process the message
-                        //    await onMessageReceived(message, cancellationToken);
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    _logger.ErrorFormat(
-                        //        Resources.MessageFailsValidationLogEntry,
-                        //        rabbitMessage.DeliveryTag,
-                        //        queueName,
-                        //        ex.Message);
-
-                        //    NegativelyAcknowledge(rabbitMessage.DeliveryTag);
-                        //}
                     };
 
                     var dynamicQueue = $"{_queueConfiguration.TemporaryQueueNamePrefix}_{Guid.NewGuid().ToString()}";
