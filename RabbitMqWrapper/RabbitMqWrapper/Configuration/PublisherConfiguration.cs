@@ -17,7 +17,7 @@ namespace RabbitMQWrapper.Configuration
         [JsonProperty("exchangeName")]
         public string ExchangeName { get; set; }
 
-        [DataMember(IsRequired = true)]
+        [DataMember(IsRequired = false)]
         [JsonProperty("routingKey")]
         public string RoutingKey { get; set; }
 
@@ -25,5 +25,19 @@ namespace RabbitMQWrapper.Configuration
         [JsonProperty("publishesPersistentMessages", DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(true)]
         public bool PublishesPersistentMessages { get; set; }
+
+        public bool IsValid
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Name))
+                    return false;
+
+                if (string.IsNullOrEmpty(ExchangeName))
+                    return false;
+
+                return true;
+            }
+        }
     }
 }

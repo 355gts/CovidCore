@@ -14,8 +14,6 @@ namespace RabbitMQWrapper.Configuration
         ushort MessagePrefetchCount { get; set; }
         int MillisecondsBetweenConnectionRetries { get; set; }
         int NetworkRecoveryIntervalSeconds { get; set; }
-        string Password { get; set; }
-        int? Port { get; set; }
         int ProtocolTimeoutIntervalSeconds { get; set; }
         IEnumerable<PublisherConfiguration> Publishers { get; set; }
         int PublishMessageConfirmationTimeoutSeconds { get; set; }
@@ -24,6 +22,6 @@ namespace RabbitMQWrapper.Configuration
         ushort RequestedHeartbeatSeconds { get; set; }
         string TemporaryQueueNamePrefix { get; set; }
         Uri Uri { get; set; }
-        string Username { get; set; }
+        bool IsValid { get; }
     }
 }

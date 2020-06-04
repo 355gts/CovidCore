@@ -29,5 +29,24 @@ namespace RabbitMQWrapper.Configuration
         [JsonProperty("messageWaitTimeoutMilliseconds", DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(1000)]
         public int MessageWaitTimeoutMilliseconds { get; set; }
+
+        public bool IsValid
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Name))
+                    return false;
+
+                // either QueueName or ExchangeName should be populated
+                if (string.IsNullOrEmpty(QueueName) && string.IsNullOrEmpty(ExchangeName))
+                    return false;
+
+                // if ExchangeName is populated then RoutingKey should also be populated 
+                if (string.IsNullOrEmpty(ExchangeName) && string.IsNullOrEmpty(RoutingKey))
+                    return false;
+
+                return true;
+            }
+        }
     }
 }

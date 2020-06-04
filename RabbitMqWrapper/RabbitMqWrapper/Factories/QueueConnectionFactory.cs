@@ -28,8 +28,13 @@ namespace RabbitMQWrapper.Factories
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _queueWrapperConfig = queueWrapperConfig ?? throw new ArgumentNullException(nameof(QueueConnectionFactory));
+
             if (certificateHelper == null)
                 throw new ArgumentNullException(nameof(certificateHelper));
+
+            // verify that the queue configuration is valid
+            if (!_queueWrapperConfig.IsValid)
+                throw new ArgumentException("Queue Configuration is not valid", nameof(_queueWrapperConfig));
 
             _connections = new ConcurrentDictionary<string, IConnectionHandler>();
 
@@ -44,7 +49,7 @@ namespace RabbitMQWrapper.Factories
             if (!certificateHelper.TryFindCertificate(queueWrapperConfig.ClientCertificateSubjectName, out certificates))
             {
                 throw new FatalErrorException(
-                    string.Format(Resources.CouldNotFindCertificateError, queueWrapperConfig.ClientCertificateSubjectName, certificates.Count));
+                    string.Format(Resources.CouldNotFindCertificateError, queueWrapperConfig.ClientCertificateSubjectName, certificates?.Count));
             }
 
             _connectionFactory.Ssl.Certs = certificates;
@@ -53,15 +58,13 @@ namespace RabbitMQWrapper.Factories
             _connectionFactory.AutomaticRecoveryEnabled = queueWrapperConfig.AutomaticRecoveryEnabled;
             _connectionFactory.NetworkRecoveryInterval = TimeSpan.FromSeconds(queueWrapperConfig.NetworkRecoveryIntervalSeconds);
             _connectionFactory.RequestedHeartbeat = queueWrapperConfig.RabbitMQHeartbeatSeconds;
-
-            //this.ConnectionShuttingDown = false;
-            //this.cancellationToken = cancellationToken;
-            //this.cancellationToken.Register(ConnectionCancelled);
-
         }
 
         public IConnectionHandler CreateConnection(string connectionName, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(connectionName))
+                throw new ArgumentNullException(nameof(connectionName));
+
             lock (_lock)
             {
                 // if the connection is disposed remove it so that it can be re-initalised

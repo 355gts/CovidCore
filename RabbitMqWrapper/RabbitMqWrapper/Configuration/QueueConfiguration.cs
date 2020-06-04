@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace RabbitMQWrapper.Configuration
@@ -64,18 +65,6 @@ namespace RabbitMQWrapper.Configuration
         public int ProtocolTimeoutIntervalSeconds { get; set; }
 
         [DataMember(IsRequired = false)]
-        [JsonProperty("username")]
-        public string Username { get; set; }
-
-        [DataMember(IsRequired = false)]
-        [JsonProperty("password")]
-        public string Password { get; set; }
-
-        [DataMember(IsRequired = false)]
-        [JsonProperty("port")]
-        public int? Port { get; set; }
-
-        [DataMember(IsRequired = false)]
         [JsonProperty("continuationTimeoutSeconds", DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(10)]
         public int ContinuationTimeoutSeconds { get; set; }
@@ -102,5 +91,25 @@ namespace RabbitMQWrapper.Configuration
         [DataMember(IsRequired = false)]
         [JsonProperty("publishers")]
         public IEnumerable<PublisherConfiguration> Publishers { get; set; }
+
+        public bool IsValid
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Uri.ToString()))
+                    return false;
+
+                if (string.IsNullOrEmpty(ClientCertificateSubjectName))
+                    return false;
+
+                if (Consumers != null && !Consumers.Any(c => c.IsValid))
+                    return false;
+
+                if (Publishers != null && !Publishers.Any(p => p.IsValid))
+                    return false;
+
+                return true;
+            }
+        }
     }
 }

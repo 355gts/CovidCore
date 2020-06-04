@@ -6,5 +6,6 @@
         string Name { get; set; }
         bool PublishesPersistentMessages { get; set; }
         string RoutingKey { get; set; }
+        bool IsValid { get; }
     }
 }

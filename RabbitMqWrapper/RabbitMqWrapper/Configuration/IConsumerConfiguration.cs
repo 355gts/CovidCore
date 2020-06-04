@@ -7,5 +7,6 @@
         string Name { get; set; }
         string QueueName { get; set; }
         string RoutingKey { get; set; }
+        bool IsValid { get; }
     }
 }
