@@ -8,6 +8,7 @@ using RabbitMQWrapper.Factories;
 using RabbitMQWrapper.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -38,14 +39,15 @@ namespace RabbitMQWrapper.Publisher
             if (queueConfiguration == null)
                 throw new ArgumentNullException(nameof(queueConfiguration));
 
-            if (cancellationToken == null)
-                throw new ArgumentNullException(nameof(cancellationToken));
-
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _publisherName = publisherName ?? throw new ArgumentNullException(nameof(publisherName));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _validationHelper = validationHelper ?? throw new ArgumentNullException(nameof(validationHelper));
             _cancellationToken = cancellationToken;
+
+            // verify that the queue configuration is valid
+            if (!queueConfiguration.IsValid)
+                throw new ArgumentException("Queue Configuration is not valid", nameof(queueConfiguration));
 
             // retrieve the specific queues configuration
             _publisherConfig = queueConfiguration.Publishers?.FirstOrDefault(c => c.Name == _publisherName);
@@ -71,13 +73,15 @@ namespace RabbitMQWrapper.Publisher
 
         public void Publish(T message, IDictionary<string, object> headers, string dynamicRoutingKey)
         {
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
+
             try
             {
-                if (message == null)
-                    throw new ArgumentNullException(nameof(message));
-
                 // Validate message
-                _validationHelper.Validate(message);
+                string validationErrors;
+                if (!_validationHelper.TryValidate(message, out validationErrors))
+                    throw new ValidationException(validationErrors);
 
                 // serialise object...
                 string messageBody = _serializer.SerializeObject(message);
@@ -100,10 +104,14 @@ namespace RabbitMQWrapper.Publisher
                     }
                 }
 
-                _channel.BasicPublish(exchange: _publisherConfig.ExchangeName,
-                                     routingKey: routingKey,
-                                     basicProperties: null,
-                                     body: Encoding.UTF8.GetBytes(messageBody));
+                // Create message properties
+                var basicProperties = CreateBasicProperties(headers);
+
+                _channel.BasicPublish(_publisherConfig.ExchangeName,
+                                     routingKey,
+                                     true,
+                                     basicProperties,
+                                     Encoding.UTF8.GetBytes(messageBody));
 
                 _logger.Info($"Sent message");
 
@@ -123,6 +131,31 @@ namespace RabbitMQWrapper.Publisher
                 if (_connection != null)
                     _connection.Dispose();
             }
+        }
+
+        private IBasicProperties CreateBasicProperties(IDictionary<string, object> headers)
+        {
+            var basicProperties = _channel.CreateBasicProperties();
+            basicProperties.AppId = $"{GlobalContext.Properties["COMPONENT-NAME"]}_{Environment.MachineName}";
+
+            if (_serializer.GetType() == typeof(XmlSerializer))
+            {
+                basicProperties.ContentType = "application/xml";
+            }
+            else
+            {
+                basicProperties.ContentType = "application/json";
+            }
+
+            if (headers != null)
+            {
+                basicProperties.Headers = headers;
+            }
+
+            basicProperties.Persistent = _publisherConfig.PublishesPersistentMessages;
+            basicProperties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+
+            return basicProperties;
         }
     }
 }

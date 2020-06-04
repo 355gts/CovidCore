@@ -50,6 +50,10 @@ namespace RabbitMQWrapper.Consumer
 
             _consumerName = consumerName;
 
+            // verify that the queue configuration is valid
+            if (!queueConfiguration.IsValid)
+                throw new ArgumentException("Queue Configuration is not valid", nameof(queueConfiguration));
+
             // retrieve the specific queues configuration
             _consumerConfig = queueConfiguration.Consumers?.FirstOrDefault(c => c.Name == _consumerName);
 

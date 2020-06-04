@@ -28,6 +28,8 @@ namespace RabbitMQWrapper.UnitTest.Extensions
                                   new PublisherConfiguration()
                                   {
                                       Name = "publisherName",
+                                      ExchangeName = "exchangeName",
+                                      RoutingKey = "routingKey",
                                   }
                               });
             return queueConfiguration;

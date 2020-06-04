@@ -25,7 +25,6 @@
   <ItemGroup>
     <Folder Include="Connection\" />
     <Folder Include="EventListeners\" />
-    <Folder Include="Publisher\" />
   </ItemGroup>
 
 </Project>
