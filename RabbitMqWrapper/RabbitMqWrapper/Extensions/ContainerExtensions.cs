@@ -1,10 +1,10 @@
 ﻿using Autofac;
-using RabbitMqWrapper.Consumer;
-using RabbitMqWrapper.Publisher;
+using RabbitMQWrapper.Consumer;
+using RabbitMQWrapper.Publisher;
 using System;
 using System.Threading;
 
-namespace RabbitMqWrapper.Extensions
+namespace RabbitMQWrapper.Extensions
 {
     public static class ContainerExtensions
     {

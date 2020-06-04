@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RabbitMqWrapper.Configuration
+namespace RabbitMQWrapper.Configuration
 {
     public interface IQueueConfiguration
     {

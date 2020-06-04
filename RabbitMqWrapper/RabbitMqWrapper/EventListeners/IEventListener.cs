@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace RabbitMqWrapper.EventListeners
+namespace RabbitMQWrapper.EventListeners
 {
     public interface IEventListener
     {

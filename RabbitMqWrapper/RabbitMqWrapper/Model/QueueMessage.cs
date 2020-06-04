@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RabbitMqWrapper.Model
+namespace RabbitMQWrapper.Model
 {
     public sealed class QueueMessage<T> where T : class
     {

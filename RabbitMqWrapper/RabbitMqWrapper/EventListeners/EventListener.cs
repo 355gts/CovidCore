@@ -4,21 +4,21 @@ using CommonUtils.Serializer;
 using CommonUtils.Validation;
 using log4net;
 using RabbitMQ.Client.Exceptions;
-using RabbitMqWrapper.Consumer;
-using RabbitMqWrapper.Enumerations;
-using RabbitMqWrapper.Model;
-using RabbitMqWrapper.Properties;
+using RabbitMQWrapper.Consumer;
+using RabbitMQWrapper.Enumerations;
+using RabbitMQWrapper.Model;
+using RabbitMQWrapper.Properties;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RabbitMqWrapper.EventListeners
+namespace RabbitMQWrapper.EventListeners
 {
     public abstract class EventListener<TMessage> : IEventListener where TMessage : class
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(EventListener<>));
 
-        private readonly IQueueConsumer<TMessage> _queueConsumer;
+        protected readonly IQueueConsumer<TMessage> _queueConsumer;
         protected readonly IJsonSerializer _serializer;
         protected readonly IValidationHelper _validationHelper;
         private readonly string performanceLoggingMethodName;

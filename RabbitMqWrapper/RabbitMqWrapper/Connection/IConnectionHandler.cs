@@ -1,7 +1,7 @@
 ﻿using RabbitMQ.Client;
 using System;
 
-namespace RabbitMqWrapper.Connection
+namespace RabbitMQWrapper.Connection
 {
     public interface IConnectionHandler : IDisposable
     {

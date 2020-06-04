@@ -1,16 +1,16 @@
 ﻿using CommonUtils.Certificates;
 using CommonUtils.Exceptions;
 using RabbitMQ.Client;
-using RabbitMqWrapper.Configuration;
-using RabbitMqWrapper.Connection;
-using RabbitMqWrapper.Properties;
+using RabbitMQWrapper.Configuration;
+using RabbitMQWrapper.Connection;
+using RabbitMQWrapper.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
-namespace RabbitMqWrapper.Factories
+namespace RabbitMQWrapper.Factories
 {
     public class QueueConnectionFactory : IQueueConnectionFactory
     {

@@ -1,8 +1,8 @@
-﻿using RabbitMqWrapper.Connection;
+﻿using RabbitMQWrapper.Connection;
 using System;
 using System.Threading;
 
-namespace RabbitMqWrapper.Factories
+namespace RabbitMQWrapper.Factories
 {
     public interface IQueueConnectionFactory : IDisposable
     {

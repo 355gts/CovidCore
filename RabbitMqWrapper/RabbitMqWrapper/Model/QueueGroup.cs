@@ -1,4 +1,4 @@
-﻿namespace RabbitMqWrapper.Model
+﻿namespace RabbitMQWrapper.Model
 {
     public sealed class QueueGroup<TGroup> where TGroup : struct
     {

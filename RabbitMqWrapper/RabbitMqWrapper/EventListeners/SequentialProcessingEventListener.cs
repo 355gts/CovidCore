@@ -4,10 +4,10 @@ using CommonUtils.Serializer;
 using CommonUtils.Threading;
 using CommonUtils.Validation;
 using log4net;
-using RabbitMqWrapper.Consumer;
-using RabbitMqWrapper.Enumerations;
-using RabbitMqWrapper.Model;
-using RabbitMqWrapper.Properties;
+using RabbitMQWrapper.Consumer;
+using RabbitMQWrapper.Enumerations;
+using RabbitMQWrapper.Model;
+using RabbitMQWrapper.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RabbitMqWrapper.EventListeners
+namespace RabbitMQWrapper.EventListeners
 {
     public abstract class SequentialProcessingEventListener<TMessage> : IEventListener where TMessage : class
     {

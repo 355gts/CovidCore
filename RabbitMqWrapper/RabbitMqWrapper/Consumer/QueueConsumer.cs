@@ -3,11 +3,11 @@ using CommonUtils.Validation;
 using log4net;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMqWrapper.Configuration;
-using RabbitMqWrapper.Connection;
-using RabbitMqWrapper.Factories;
-using RabbitMqWrapper.Model;
-using RabbitMqWrapper.Properties;
+using RabbitMQWrapper.Configuration;
+using RabbitMQWrapper.Connection;
+using RabbitMQWrapper.Factories;
+using RabbitMQWrapper.Model;
+using RabbitMQWrapper.Properties;
 using System;
 using System.IO;
 using System.Linq;
@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RabbitMqWrapper.Consumer
+namespace RabbitMQWrapper.Consumer
 {
     public class QueueConsumer<T> : IQueueConsumer<T> where T : class
     {

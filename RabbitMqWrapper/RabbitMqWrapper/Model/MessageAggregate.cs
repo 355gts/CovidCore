@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace RabbitMqWrapper.Model
+namespace RabbitMQWrapper.Model
 {
     internal sealed class MessageAggregate<TMessage> where TMessage : class
     {

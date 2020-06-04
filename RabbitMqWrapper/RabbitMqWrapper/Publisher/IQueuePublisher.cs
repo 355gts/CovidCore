@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RabbitMqWrapper.Publisher
+namespace RabbitMQWrapper.Publisher
 {
     public interface IQueuePublisher<T> where T : class
     {

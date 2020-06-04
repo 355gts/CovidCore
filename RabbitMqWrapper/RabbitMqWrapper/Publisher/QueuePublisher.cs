@@ -2,17 +2,17 @@
 using CommonUtils.Validation;
 using log4net;
 using RabbitMQ.Client;
-using RabbitMqWrapper.Configuration;
-using RabbitMqWrapper.Connection;
-using RabbitMqWrapper.Factories;
-using RabbitMqWrapper.Properties;
+using RabbitMQWrapper.Configuration;
+using RabbitMQWrapper.Connection;
+using RabbitMQWrapper.Factories;
+using RabbitMQWrapper.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace RabbitMqWrapper.Publisher
+namespace RabbitMQWrapper.Publisher
 {
     public sealed class QueuePublisher<T> : IQueuePublisher<T> where T : class
     {

@@ -1,4 +1,4 @@
-﻿namespace RabbitMqWrapper.Configuration
+﻿namespace RabbitMQWrapper.Configuration
 {
     public interface IQueueConfig
     {

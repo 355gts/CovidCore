@@ -1,4 +1,4 @@
-﻿namespace RabbitMqWrapper.Enumerations
+﻿namespace RabbitMQWrapper.Enumerations
 {
     public enum AcknowledgeBehaviour
     {
