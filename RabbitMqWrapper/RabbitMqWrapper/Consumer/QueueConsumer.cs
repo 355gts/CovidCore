@@ -31,8 +31,8 @@ namespace RabbitMQWrapper.Consumer
         private bool _connected;
         private readonly object _lock = new object();
         private readonly object _channelLock = new object();
-        private readonly string performanceLoggingMethodName;
-        private string queueName;
+        private readonly string _performanceLoggingMethodName;
+        private string _queueName;
 
         public QueueConsumer(IQueueConfiguration queueConfiguration,
                              IQueueConnectionFactory connectionFactory,
@@ -56,11 +56,14 @@ namespace RabbitMQWrapper.Consumer
             if (_consumerConfig == null)
                 throw new ArgumentNullException(nameof(_consumerConfig));
 
-            this.performanceLoggingMethodName = GetType().Name + "." + nameof(Run);
+            this._performanceLoggingMethodName = $"{consumerName}.Run";
         }
 
         public void Run(Func<QueueMessage<T>, CancellationToken, Task> onMessageReceived, CancellationToken cancellationToken)
         {
+            if (onMessageReceived == null)
+                throw new ArgumentNullException(nameof(onMessageReceived));
+
             try
             {
                 if (!_connected)
@@ -73,45 +76,46 @@ namespace RabbitMQWrapper.Consumer
                     var consumer = new EventingBasicConsumer(_channel);
                     consumer.Received += async (model, rabbitMessage) =>
                     {
-                        try
-                        {
-                            // Deserialize object
-                            T messageObject = _serializer.Deserialize<T>(Encoding.UTF8.GetString(rabbitMessage.Body));
+                        await ProcessMessageAsync(model, rabbitMessage, onMessageReceived, cancellationToken);
+                        //try
+                        //{
+                        //    // Deserialize object
+                        //    T messageObject = _serializer.Deserialize<T>(Encoding.UTF8.GetString(rabbitMessage.Body));
 
-                            // Validate object
-                            string validationErrors;
-                            bool success = _validationHelper.TryValidate(messageObject, out validationErrors);
+                        //    // Validate object
+                        //    string validationErrors;
+                        //    bool success = _validationHelper.TryValidate(messageObject, out validationErrors);
 
-                            if (!success)
-                            {
-                                _logger.ErrorFormat(
-                                    Resources.MessageFailsValidationLogEntry,
-                                    rabbitMessage.DeliveryTag,
-                                    queueName,
-                                    validationErrors);
-                                NegativelyAcknowledge(rabbitMessage.DeliveryTag);
-                                return;
-                            }
+                        //    if (!success)
+                        //    {
+                        //        _logger.ErrorFormat(
+                        //            Resources.MessageFailsValidationLogEntry,
+                        //            rabbitMessage.DeliveryTag,
+                        //            queueName,
+                        //            validationErrors);
+                        //        NegativelyAcknowledge(rabbitMessage.DeliveryTag);
+                        //        return;
+                        //    }
 
-                            _logger.InfoFormat(Resources.MessageSuccessfullyReceivedLogEntry, rabbitMessage.DeliveryTag, queueName);
-                            var message = new QueueMessage<T>(messageObject,
-                                rabbitMessage.DeliveryTag,
-                                rabbitMessage.RoutingKey,
-                                rabbitMessage.BasicProperties.Headers);
+                        //    _logger.InfoFormat(Resources.MessageSuccessfullyReceivedLogEntry, rabbitMessage.DeliveryTag, queueName);
+                        //    var message = new QueueMessage<T>(messageObject,
+                        //        rabbitMessage.DeliveryTag,
+                        //        rabbitMessage.RoutingKey,
+                        //        rabbitMessage.BasicProperties.Headers);
 
-                            // call the event handler to process the message
-                            await onMessageReceived(message, cancellationToken);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.ErrorFormat(
-                                Resources.MessageFailsValidationLogEntry,
-                                rabbitMessage.DeliveryTag,
-                                queueName,
-                                ex.Message);
+                        //    // call the event handler to process the message
+                        //    await onMessageReceived(message, cancellationToken);
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    _logger.ErrorFormat(
+                        //        Resources.MessageFailsValidationLogEntry,
+                        //        rabbitMessage.DeliveryTag,
+                        //        queueName,
+                        //        ex.Message);
 
-                            NegativelyAcknowledge(rabbitMessage.DeliveryTag);
-                        }
+                        //    NegativelyAcknowledge(rabbitMessage.DeliveryTag);
+                        //}
                     };
 
                     var dynamicQueue = $"{_queueConfiguration.TemporaryQueueNamePrefix}_{Guid.NewGuid().ToString()}";
@@ -124,16 +128,16 @@ namespace RabbitMQWrapper.Consumer
                             throw new IOException(Resources.TemporaryQueueCreationError);
                         }
 
-                        queueName = queueDeclareResult.QueueName;
+                        _queueName = dynamicQueue;
                         _channel.QueueBind(dynamicQueue, _consumerConfig.ExchangeName, _consumerConfig.RoutingKey);
                     }
                     else
                     {
 
-                        queueName = _consumerConfig.QueueName;
+                        _queueName = _consumerConfig.QueueName;
                     }
 
-                    _channel.BasicConsume(queue: queueName,
+                    _channel.BasicConsume(queue: _queueName,
                                          autoAck: false,
                                          consumer: consumer);
                     _connected = true;
@@ -160,19 +164,13 @@ namespace RabbitMQWrapper.Consumer
         {
             lock (_channelLock)
             {
-                // if we lose connection acknowledging a delivery tag that 
-                // rabbit does not know about causes the client to stop the consumer
-                // so check the connection is still alive
-                //if (channelAvailableEvent.IsSet)
-                //{
                 if (_channel.IsOpen)
                 {
                     _channel.BasicAck(deliveryTag, false);
                 }
-                //}
             }
 
-            //_logger.DebugFormat(MessageAcknowledgedLogEntry, deliveryTag, queueName);
+            _logger.DebugFormat(Resources.MessageAcknowledgedLogEntry, deliveryTag, _queueName);
         }
 
         public void NegativelyAcknowledge(ulong deliveryTag)
@@ -181,24 +179,18 @@ namespace RabbitMQWrapper.Consumer
             {
                 lock (_channelLock)
                 {
-                    // if we lose connection acknowledging a delivery tag that 
-                    // rabbit does not know about causes the client to stop the consumer
-                    // so check the connection is still alive
-                    //if (channelAvailableEvent.IsSet)
-                    //{
                     if (_channel.IsOpen)
                     {
                         _channel.BasicNack(deliveryTag, false, false);
                     }
-                    //}
                 }
 
-                //_logger.DebugFormat(MessageNegativelyAcknowledgedLogEntry, deliveryTag, queueName);
+                _logger.DebugFormat(Resources.MessageNegativelyAcknowledgedLogEntry, deliveryTag, _queueName);
             }
             catch (Exception e)
             {
                 // Do nothing - we don't mind that the nack has failed. Rabbit will fix this if necessary.
-                //_logger.WarnFormat("Failed to negatively acknowledge message {0} from queue {1}. {2}", deliveryTag, queueName, e);
+                _logger.WarnFormat("Failed to negatively acknowledge message {0} from queue {1}. {2}", deliveryTag, _queueName, e);
             }
         }
 
@@ -206,19 +198,65 @@ namespace RabbitMQWrapper.Consumer
         {
             lock (_channelLock)
             {
-                // if we lose connection acknowledging a delivery tag that 
-                // rabbit does not know about causes the client to stop the consumer
-                // so check the connection is still alive
-                //if (channelAvailableEvent.IsSet)
-                //{
                 if (_channel.IsOpen)
                 {
                     _channel.BasicNack(deliveryTag, false, true);
                 }
-                //}
             }
 
-            //_logger.DebugFormat(MessageRequeuedLogEntry, deliveryTag, queueName);
+            _logger.DebugFormat(Resources.MessageRequeuedLogEntry, deliveryTag, _queueName);
+        }
+
+        private async Task ProcessMessageAsync(object model, BasicDeliverEventArgs rabbitMessage, Func<QueueMessage<T>, CancellationToken, Task> onMessageReceived, CancellationToken cancellationToken)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            if (rabbitMessage == null)
+                throw new ArgumentNullException(nameof(rabbitMessage));
+
+            if (onMessageReceived == null)
+                throw new ArgumentNullException(nameof(onMessageReceived));
+
+            try
+            {
+                // Deserialize object
+                T messageObject = _serializer.Deserialize<T>(Encoding.UTF8.GetString(rabbitMessage.Body));
+
+                // Validate object
+                string validationErrors;
+                bool success = _validationHelper.TryValidate(messageObject, out validationErrors);
+
+                if (!success)
+                {
+                    _logger.ErrorFormat(
+                        Resources.MessageFailsValidationLogEntry,
+                        rabbitMessage.DeliveryTag,
+                        _queueName,
+                        validationErrors);
+                    NegativelyAcknowledge(rabbitMessage.DeliveryTag);
+                    return;
+                }
+
+                _logger.InfoFormat(Resources.MessageSuccessfullyReceivedLogEntry, rabbitMessage.DeliveryTag, _queueName);
+                var message = new QueueMessage<T>(messageObject,
+                    rabbitMessage.DeliveryTag,
+                    rabbitMessage.RoutingKey,
+                    rabbitMessage.BasicProperties.Headers);
+
+                // call the event handler to process the message
+                await onMessageReceived(message, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorFormat(
+                    Resources.MessageFailsValidationLogEntry,
+                    rabbitMessage.DeliveryTag,
+                    _queueName,
+                    ex.Message);
+
+                NegativelyAcknowledge(rabbitMessage.DeliveryTag);
+            }
         }
     }
 }

@@ -97,11 +97,29 @@ namespace RabbitMQWrapper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Acknowledged message with delivery tag &apos;{0}&apos; from queue &apos;{1}&apos;..
+        /// </summary>
+        internal static string MessageAcknowledgedLogEntry {
+            get {
+                return ResourceManager.GetString("MessageAcknowledgedLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid message received with delivery tag &apos;{0}&apos; from queue &apos;{1}&apos;. Validation errors: {2}..
         /// </summary>
         internal static string MessageFailsValidationLogEntry {
             get {
                 return ResourceManager.GetString("MessageFailsValidationLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Negatively acknowledged message with delivery tag &apos;{0}&apos; from queue &apos;{1}&apos;..
+        /// </summary>
+        internal static string MessageNegativelyAcknowledgedLogEntry {
+            get {
+                return ResourceManager.GetString("MessageNegativelyAcknowledgedLogEntry", resourceCulture);
             }
         }
         
@@ -120,6 +138,15 @@ namespace RabbitMQWrapper.Properties {
         internal static string MessageReceivedLogEntry {
             get {
                 return ResourceManager.GetString("MessageReceivedLogEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Negatively acknowledged and requeued message with delivery tag &apos;{0}&apos; from queue &apos;{1}&apos;..
+        /// </summary>
+        internal static string MessageRequeuedLogEntry {
+            get {
+                return ResourceManager.GetString("MessageRequeuedLogEntry", resourceCulture);
             }
         }
         
