@@ -1,7 +1,5 @@
 ﻿using CommonUtils.Exceptions;
 using CommonUtils.Logging;
-using CommonUtils.Serializer;
-using CommonUtils.Validation;
 using log4net;
 using RabbitMQ.Client.Exceptions;
 using RabbitMQWrapper.Consumer;
@@ -19,18 +17,11 @@ namespace RabbitMQWrapper.EventListeners
         private readonly ILog _logger = LogManager.GetLogger(typeof(EventListener<>));
 
         protected readonly IQueueConsumer<TMessage> _queueConsumer;
-        protected readonly IJsonSerializer _serializer;
-        protected readonly IValidationHelper _validationHelper;
         private readonly string performanceLoggingMethodName;
 
-        public EventListener(
-            IQueueConsumer<TMessage> queueConsumer,
-            IJsonSerializer serializer,
-            IValidationHelper validationHelper)
+        public EventListener(IQueueConsumer<TMessage> queueConsumer)
         {
             _queueConsumer = queueConsumer ?? throw new ArgumentNullException(nameof(queueConsumer));
-            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            _validationHelper = validationHelper ?? throw new ArgumentNullException(nameof(validationHelper));
 
             this.performanceLoggingMethodName = GetType().Name + "." + nameof(ProcessMessageAsync);
         }

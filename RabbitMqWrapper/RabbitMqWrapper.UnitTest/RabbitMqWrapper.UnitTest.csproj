@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Connection\" />
-    <Folder Include="EventListeners\" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,4 @@
-﻿using CommonUtils.Serializer;
-using CommonUtils.Validation;
-using Covid.Common.HttpClientHelper;
+﻿using Covid.Common.HttpClientHelper;
 using Covid.Common.Mapper;
 using Covid.Message.Model.Publisher;
 using Covid.Message.Model.Users;
@@ -25,10 +23,8 @@ namespace Covid.UserService.EventListeners
             IQueueConsumer<CreateUser> userQueueConsumer,
             IMessagePublisher messagePublisher,
             IMapper mapper,
-            ICovidApiHelper covidApiHelper,
-            IJsonSerializer serializer,
-            IValidationHelper validationHelper)
-            : base(userQueueConsumer, serializer, validationHelper)
+            ICovidApiHelper covidApiHelper)
+            : base(userQueueConsumer)
         {
             _messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

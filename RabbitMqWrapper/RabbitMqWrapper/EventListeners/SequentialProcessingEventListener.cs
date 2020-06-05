@@ -1,8 +1,5 @@
 ﻿using CommonUtils.Exceptions;
 using CommonUtils.Logging;
-using CommonUtils.Serializer;
-using CommonUtils.Threading;
-using CommonUtils.Validation;
 using log4net;
 using RabbitMQWrapper.Consumer;
 using RabbitMQWrapper.Enumerations;
@@ -19,38 +16,19 @@ namespace RabbitMQWrapper.EventListeners
 {
     public abstract class SequentialProcessingEventListener<TMessage> : IEventListener where TMessage : class
     {
-        private sealed class ProcessingQueue
-        {
-            public ConcurrentQueue<QueueMessage<TMessage>> Queue { get; set; }
-
-            public AutoResetEventAsync AutoResetEvent { get; set; }
-
-            public ProcessingQueue()
-            {
-                Queue = new ConcurrentQueue<QueueMessage<TMessage>>();
-                AutoResetEvent = new AutoResetEventAsync();
-            }
-        }
-
         private readonly ILog _logger = LogManager.GetLogger(typeof(SequentialProcessingEventListener<>));
 
         private readonly IQueueConsumer<TMessage> _queueConsumer;
-        protected readonly IJsonSerializer _serializer;
-        protected readonly IValidationHelper _validationHelper;
         private readonly string performanceLoggingMethodName;
-        private readonly ConcurrentDictionary<string, ProcessingQueue> processingQueues;
-        private ConcurrentDictionary<string, Task> tasks;
+        private readonly ConcurrentDictionary<string, ProcessingQueue<TMessage>> _processingQueues;
+        private readonly ConcurrentDictionary<string, Task> _tasks;
 
-        public SequentialProcessingEventListener(
-            IQueueConsumer<TMessage> queueConsumer,
-            IJsonSerializer serializer,
-            IValidationHelper validationHelper)
+        public SequentialProcessingEventListener(IQueueConsumer<TMessage> queueConsumer)
         {
             _queueConsumer = queueConsumer ?? throw new ArgumentNullException(nameof(queueConsumer));
-            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            _validationHelper = validationHelper ?? throw new ArgumentNullException(nameof(validationHelper));
-            processingQueues = new ConcurrentDictionary<string, ProcessingQueue>();
-            tasks = new ConcurrentDictionary<string, Task>();
+
+            _processingQueues = new ConcurrentDictionary<string, ProcessingQueue<TMessage>>();
+            _tasks = new ConcurrentDictionary<string, Task>();
             this.performanceLoggingMethodName = GetType().Name + "." + nameof(ProcessMessageAsync);
         }
 
@@ -72,36 +50,36 @@ namespace RabbitMQWrapper.EventListeners
 
         private async Task MessageReceivedAsync(QueueMessage<TMessage> message, CancellationToken cancellationToken)
         {
-            if (!cancellationToken.IsCancellationRequested && !tasks.Any(t => t.Value.IsFaulted))
+            if (!cancellationToken.IsCancellationRequested && !_tasks.Any(t => t.Value.IsFaulted))
             {
                 if (Behaviour == AcknowledgeBehaviour.BeforeProcess)
                     _queueConsumer.AcknowledgeMessage(message.DeliveryTag);
 
                 string processingSequenceIdentifier = GetProcessingSequenceIdentifier(message.RoutingKey);
 
-                if (processingQueues.ContainsKey(processingSequenceIdentifier))
+                if (_processingQueues.ContainsKey(processingSequenceIdentifier))
                 {
                     // Add a message to the processing queue, and signal the processing thread to alert it to the new message.
-                    var processingQueue = processingQueues[processingSequenceIdentifier];
+                    var processingQueue = _processingQueues[processingSequenceIdentifier];
                     processingQueue.Queue.Enqueue(message);
                     processingQueue.AutoResetEvent.Set();
                 }
                 else
                 {
                     // create a new processing queue and kick off a task to process it.
-                    var processingQueue = new ProcessingQueue();
+                    var processingQueue = new ProcessingQueue<TMessage>();
                     processingQueue.Queue.Enqueue(message);
-                    processingQueues[processingSequenceIdentifier] = processingQueue;
+                    _processingQueues[processingSequenceIdentifier] = processingQueue;
                     var t = Task.Run(RunSequentialProcessor(processingQueue, cancellationToken));
-                    tasks.TryAdd(processingSequenceIdentifier, t);
+                    _tasks.TryAdd(processingSequenceIdentifier, t);
                 }
 
-                _logger.Info($"Received new message {message.DeliveryTag}, processor queue length {processingQueues.First().Value.Queue.Count()}");
+                _logger.Info($"Received new message {message.DeliveryTag}, processor queue length {_processingQueues.First().Value.Queue.Count()}");
             }
 
             // Remove completed queues
             var processingQueuesToRemove = new List<string>();
-            foreach (var processingQueue in processingQueues)
+            foreach (var processingQueue in _processingQueues)
             {
                 if (!processingQueue.Value.Queue.Any())
                 {
@@ -112,17 +90,17 @@ namespace RabbitMQWrapper.EventListeners
 
             foreach (var processingQueueToRemove in processingQueuesToRemove)
             {
-                processingQueues.TryRemove(processingQueueToRemove, out _);
-                tasks.TryRemove(processingQueueToRemove, out _);
+                _processingQueues.TryRemove(processingQueueToRemove, out _);
+                _tasks.TryRemove(processingQueueToRemove, out _);
             }
 
             // TODO: is it possible to remove executed tasks from the Task list and processingqueues from the processing queues
 
-            _logger.Info($"Number of tasks {tasks.Count()}, number of queues {processingQueues.Count()}.");
+            _logger.Info($"Number of tasks {_tasks.Count()}, number of queues {_processingQueues.Count()}.");
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        private Func<Task> RunSequentialProcessor(ProcessingQueue processingQueue, CancellationToken cancellationToken)
+        private Func<Task> RunSequentialProcessor(ProcessingQueue<TMessage> processingQueue, CancellationToken cancellationToken)
         {
             return async () =>
             {

@@ -1,6 +1,4 @@
-﻿using CommonUtils.Serializer;
-using CommonUtils.Validation;
-using log4net;
+﻿using log4net;
 using RabbitMQWrapper.Consumer;
 using RabbitMQWrapper.Enumerations;
 using RabbitMQWrapper.Model;
@@ -28,11 +26,8 @@ namespace RabbitMQWrapper.EventListeners
         #endregion
 
         #region Constructors
-        protected AggregateEventListener(
-            IQueueConsumer<TMessage> queueConsumer,
-            IJsonSerializer serializer,
-            IValidationHelper validationHelper)
-            : base(queueConsumer, serializer, validationHelper)
+        protected AggregateEventListener(IQueueConsumer<TMessage> queueConsumer)
+            : base(queueConsumer)
         {
             messageAggregateByGroup = new Dictionary<TGroup, MessageAggregate<TMessage>>();
         }

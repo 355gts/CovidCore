@@ -7,5 +7,6 @@ namespace RabbitMQWrapper.UnitTest.Model
     [Serializable]
     public class TestMessage
     {
+        public string Property { get; set; }
     }
 }
