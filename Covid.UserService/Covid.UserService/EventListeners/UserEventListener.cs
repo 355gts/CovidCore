@@ -2,16 +2,17 @@
 using Covid.Common.Mapper;
 using Covid.Message.Model.Publisher;
 using Covid.Message.Model.Users;
-using Covid.Rabbit;
-using Covid.Rabbit.Consumer;
 using log4net;
+using RabbitMQWrapper.Consumer;
+using RabbitMQWrapper.EventListeners;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Dom = Covid.Web.Model.Users;
 
 namespace Covid.UserService.EventListeners
 {
-    public class UserEventListener : EventListener<CreateUser>
+    sealed class UserEventListener : EventListener<CreateUser>
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(UserEventListener));
         private readonly IMessagePublisher _messagePublisher;
@@ -19,7 +20,7 @@ namespace Covid.UserService.EventListeners
         private readonly ICovidApiHelper _covidApiHelper;
 
         public UserEventListener(
-            QueueConsumer<CreateUser> userQueueConsumer,
+            IQueueConsumer<CreateUser> userQueueConsumer,
             IMessagePublisher messagePublisher,
             IMapper mapper,
             ICovidApiHelper covidApiHelper)
@@ -30,7 +31,7 @@ namespace Covid.UserService.EventListeners
             _covidApiHelper = covidApiHelper ?? throw new ArgumentNullException(nameof(covidApiHelper));
         }
 
-        public override async Task ProcessMessageAsync(CreateUser message, ulong deliveryTag, string routingKey = null)
+        protected override async Task ProcessMessageAsync(CreateUser message, ulong deliveryTag, CancellationToken cancellationToken, string routingKey = null)
         {
             var newUser = _mapper.Map<CreateUser, Dom.CreateUser>(message);
 

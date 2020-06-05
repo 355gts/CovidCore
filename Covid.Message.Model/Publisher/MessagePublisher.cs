@@ -1,13 +1,13 @@
 ﻿using Covid.Message.Model.Users;
-using Covid.Rabbit.Publisher;
+using RabbitMQWrapper.Publisher;
 using System;
 
 namespace Covid.Message.Model.Publisher
 {
     public class MessagePublisher : IMessagePublisher
     {
-        private readonly QueuePublisher<User> _userQueuePublisher;
-        public MessagePublisher(QueuePublisher<User> userQueuePublisher)
+        private readonly IQueuePublisher<User> _userQueuePublisher;
+        public MessagePublisher(IQueuePublisher<User> userQueuePublisher)
         {
             _userQueuePublisher = userQueuePublisher ?? throw new ArgumentNullException(nameof(userQueuePublisher));
         }
