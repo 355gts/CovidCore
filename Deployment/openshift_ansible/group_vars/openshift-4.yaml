@@ -16,6 +16,7 @@ rabbitmq_endpoint: "ec2-3-8-181-169.eu-west-2.compute.amazonaws.com"
 rabbitmq_full_endpoint: "amqp://ec2-3-8-181-169.eu-west-2.compute.amazonaws.com:5672"
 rabbitmq_username: "service"
 rabbitmq_password: "Service123Service123"
+rabbitmq_client_cert: "ISVPNKLT0000082"
 
 covid_api_endpoint: "http://covid-api:8080/"
 
