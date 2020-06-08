@@ -17,6 +17,6 @@
       data:
         appsettings.Production.json: |
             {{ config_file_decoded | to_json }}
-    host: https://api.ca-central-1.starter.openshift-online.com:6443
-    api_key: ze47el0h0BwmD1zQklcgtF6HvC_atD27kuoPePERSLU
+    host: https://api.pro-eu-west-1.openshift.com:6443
+    api_key: LNiq2nHdWxX1gnJh-kVEjQjkRUZ4N7YhEhqX97TfH6I
     apply: yes
