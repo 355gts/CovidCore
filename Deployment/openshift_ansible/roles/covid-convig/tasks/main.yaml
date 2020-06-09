@@ -1,7 +1,5 @@
 ---
 
-- pause:
-    minutes: 10 
 - name: Make a directory for the config 
   file:
     path: /opt/app-root/src/config
