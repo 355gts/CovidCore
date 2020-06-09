@@ -16,7 +16,7 @@ spec:
       - name: covid-ansible-job
         # imagestream or internal/external registry
         image: docker-registry.default.svc:5000/covid/covidcore:latest
-        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 36000']
+        #command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 36000']
         env:
         - name: PLAYBOOK_FILE
           value: Deployment/openshift_ansible/playbook.yaml
