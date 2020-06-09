@@ -1,9 +1,5 @@
 ---
 
-# - hosts: openshift-4
-#   roles: 
-#     - covid-convig
-
 - hosts: 127.0.0.1
   connection: local
   roles:

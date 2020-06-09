@@ -28,7 +28,7 @@ spec:
           value: "False"
         # options to ansible-playbook https://linux.die.net/man/1/ansible-playbook
         - name: OPTS
-          value: "-vvv"
+          value: "-v"
         - name: VAULT_PASS
           value: "Boedo123Boedo123"        
       restartPolicy: Never
