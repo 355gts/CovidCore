@@ -8,3 +8,4 @@
   connection: local
   roles:
     - covid-convig
+  become: true
