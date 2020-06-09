@@ -35,6 +35,7 @@
     dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
+  remote_src: true
 - name: Get a list of settings files to push into Openshift
   find: 
     paths: ./config/
