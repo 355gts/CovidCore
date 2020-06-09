@@ -11,6 +11,10 @@
   file:
     path: ./config
     state: directory
+- command: "pwd"
+  register: p_w_d
+- debug:
+    msg: "{{ p_w_d }}"
 - name: Get the config files
   find:
     paths: /opt/
