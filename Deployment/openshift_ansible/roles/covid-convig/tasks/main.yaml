@@ -6,10 +6,10 @@
     state: latest 
   become: true
 - name: Install Git 
-    yum:
-     name: git
-     state: present
-    become: true
+  yum:
+    name: git
+    state: present
+  become: true
 - name: Make a directory for the source
   file:
     path: ./src
