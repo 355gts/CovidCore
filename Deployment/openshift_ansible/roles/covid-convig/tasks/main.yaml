@@ -1,10 +1,8 @@
 ---
 
-- pause:
-    minutes: 10 
 - name: Make a directory for the config 
   file:
-    path: /opt/config
+    path: /opt/app-root/src/config
     state: directory
 - name: Get the config files
   find:
@@ -16,12 +14,12 @@
 - name: Template the Appsettings files
   template:
     src: "{{ item.path }}"
-    dest: "/opt/config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
+    dest: "/opt/app-root/src/config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
 - name: Get a list of settings files to push into Openshift
   find: 
-    paths: /opt/config/
+    paths: /opt/app-root/src/config/
   register: appsettings_files
 - name: Apply the ConfigMaps
   include: config_map.yaml config_file_path={{ item.path }}    
