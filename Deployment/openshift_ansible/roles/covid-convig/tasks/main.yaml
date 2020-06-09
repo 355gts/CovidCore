@@ -1,23 +1,5 @@
 ---
 
-- name: Install the Openshift pip module
-  pip:
-    name: openshift
-    state: latest 
-  become: true
-# - name: Install Git 
-#   yum:
-#     name: git
-#     state: present
-#   become: true
-# - name: Make a directory for the source
-#   file:
-#     path: ./src
-#     state: directory
-# - name: Get the latest source code from github
-#   git:
-#     repo: "https://{{ github_username | urlencode }}:{{ github_password | urlencode }}@github.com/355gts/CovidCore.git"
-#     dest: ./src
 - name: Make a directory for the config 
   file:
     path: ./config
