@@ -1,0 +1,34 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: covid-ansible-job
+spec:
+  parallelism: 1    
+  completions: 1    
+  template:         
+    metadata:
+      name: covid-ansible-job
+      labels:
+        app: covid-ansible-job
+    spec:
+      containers:
+      - name: covid-ansible-job
+        # imagestream or internal/external registry
+        image: docker-registry.default.svc:5000/covid/covidcore:latest
+        #command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 36000']
+        env:
+        - name: PLAYBOOK_FILE
+          value: Deployment/openshift_ansible/playbook.yaml
+        - name: INVENTORY_FILE
+          value: Deployment/openshift_ansible/hosts
+        #- name: ANSIBLE_PRIVATE_KEY_FILE
+        #  value: /opt/app-root/src/.ssh/id_rsa/ssh-privatekey
+        - name: ANSIBLE_HOST_KEY_CHECKING
+          value: "False"
+        # options to ansible-playbook https://linux.die.net/man/1/ansible-playbook
+        - name: OPTS
+          value: "-v"
+        - name: VAULT_PASS
+          value: "Boedo123Boedo123"        
+      restartPolicy: Never

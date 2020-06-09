@@ -1,5 +1,2 @@
 [openshift-4]
-3.8.181.169
-
-[openshift-4:vars]
-ansible_python_interpreter=/usr/bin/python2.7
+127.0.0.1

@@ -1,19 +1,12 @@
 ---
 
-- debug:
-    msg: "{{ ansible_version.full }}"
-- name: Install the Openshift pip module
-  pip:
-    name: openshift
-    state: latest 
-  become: true
 - name: Make a directory for the config 
   file:
-    path: ./config
+    path: /opt/app-root/src/config
     state: directory
 - name: Get the config files
   find:
-    paths: /opt/
+    paths: /
     patterns: "appsettings.Template.json"
     use_regex: yes
     recurse: yes
@@ -21,14 +14,16 @@
 - name: Template the Appsettings files
   template:
     src: "{{ item.path }}"
-    dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
+    dest: "/opt/app-root/src/config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
 - name: Get a list of settings files to push into Openshift
   find: 
-    paths: ./config/
+    paths: /opt/app-root/src/config/
   register: appsettings_files
 - name: Apply the ConfigMaps
   include: config_map.yaml config_file_path={{ item.path }}    
   with_items:
-    - "{{ appsettings_files.files }}"        
+    - "{{ appsettings_files.files }}"     
+- pause:
+    minutes: 10   
