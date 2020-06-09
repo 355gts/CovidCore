@@ -7,7 +7,6 @@ using RabbitMQWrapper.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
 namespace RabbitMQWrapper.Factories
@@ -45,12 +44,16 @@ namespace RabbitMQWrapper.Factories
             _connectionFactory.ContinuationTimeout = TimeSpan.FromSeconds(queueWrapperConfig.ProtocolTimeoutIntervalSeconds);
             _connectionFactory.HandshakeContinuationTimeout = TimeSpan.FromSeconds(queueWrapperConfig.ProtocolTimeoutIntervalSeconds);
 
-            X509Certificate2Collection certificates;
-            if (!certificateHelper.TryFindCertificate(queueWrapperConfig.ClientCertificateSubjectName, out certificates))
+            var certificateResult = !string.IsNullOrEmpty(queueWrapperConfig.CertificatePath)
+                ? certificateHelper.TryLoadCertificate(queueWrapperConfig.ClientCertificateSubjectName, queueWrapperConfig.CertificatePath, queueWrapperConfig.CertificatePassword)
+                : certificateHelper.TryFindCertificate(queueWrapperConfig.ClientCertificateSubjectName);
+
+            if (!certificateResult.Success)
             {
                 throw new FatalErrorException(
-                    string.Format(Resources.CouldNotFindCertificateError, queueWrapperConfig.ClientCertificateSubjectName, certificates?.Count));
+                    string.Format(Resources.CouldNotFindCertificateError, queueWrapperConfig.ClientCertificateSubjectName, certificateResult.Message));
             }
+            var certificates = certificateResult.Certificates;
 
             _connectionFactory.Ssl.Certs = certificates;
             _connectionFactory.Ssl.Version = System.Security.Authentication.SslProtocols.Tls12;

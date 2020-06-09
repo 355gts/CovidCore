@@ -22,8 +22,17 @@ namespace CommonUtils.Certificates
         /// Finds a certificate by subject name in the local machine personal store.
         /// </summary>
         /// <param name="subjectName">The subject name of the certificate to find.</param>
-        /// <param name="certificate">The certificate that was found.</param>
         /// <returns>True if a certificate was found, false otherwise.</returns>
-        bool TryFindCertificate(string subjectName, out X509Certificate2Collection certificate);
+        CertificateResult TryFindCertificate(string subjectName);
+
+        /// <summary>
+        /// Attempts to load the specified certificate and verify it relates to the specified subject name
+        /// </summary>
+        /// <param name="subjectName">The subject name of the certificate to find.</param>
+        /// <param name="certificatePath">The path to the certificate</param>
+        /// <param name="certificatePassword">The certificate password</param>
+        /// <returns></returns>
+        CertificateResult TryLoadCertificate(string subjectName, string certificatePath, string certificatePassowrd = null);
+
     }
 }
