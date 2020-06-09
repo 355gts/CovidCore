@@ -5,26 +5,26 @@
     name: openshift
     state: latest 
   become: true
-- name: Install Git 
-  yum:
-    name: git
-    state: present
-  become: true
-- name: Make a directory for the source
-  file:
-    path: ./src
-    state: directory
-- name: Get the latest source code from github
-  git:
-    repo: "https://{{ github_username | urlencode }}:{{ github_password | urlencode }}@github.com/355gts/CovidCore.git"
-    dest: ./src
+# - name: Install Git 
+#   yum:
+#     name: git
+#     state: present
+#   become: true
+# - name: Make a directory for the source
+#   file:
+#     path: ./src
+#     state: directory
+# - name: Get the latest source code from github
+#   git:
+#     repo: "https://{{ github_username | urlencode }}:{{ github_password | urlencode }}@github.com/355gts/CovidCore.git"
+#     dest: ./src
 - name: Make a directory for the config 
   file:
     path: ./config
     state: directory
 - name: Get the config files
   find:
-    paths: ./src
+    paths: /
     patterns: "appsettings.Template.json"
     use_regex: yes
     recurse: yes
@@ -35,7 +35,6 @@
     dest: "./config/{{ item.path | regex_replace('^.*\\/(Covid.*)\\/appsettings\\.Template\\.json', '\\1.json') }}"
   with_items:
     - "{{ config_files.files }}"
-  remote_src: true
 - name: Get a list of settings files to push into Openshift
   find: 
     paths: ./config/
