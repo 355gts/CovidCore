@@ -1,7 +1,5 @@
 ---
 
-- debug:
-    msg: "{{ rabbitmq_client_cert_password }}"
 - name: Make a directory for the config 
   file:
     path: /opt/app-root/src/config
@@ -26,6 +24,4 @@
 - name: Apply the ConfigMaps
   include: config_map.yaml config_file_path={{ item.path }}    
   with_items:
-    - "{{ appsettings_files.files }}"     
-- pause:
-    minutes: 10   
+    - "{{ appsettings_files.files }}"    
