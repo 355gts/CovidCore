@@ -3,11 +3,11 @@
 database_connection_string: "Server=ec2-3-8-181-169.eu-west-2.compute.amazonaws.com;Database=CovidDb;User Id=SA;Password=Test123Test123;"
 
 rabbitmq_endpoint: "ec2-3-8-181-169.eu-west-2.compute.amazonaws.com"
-rabbitmq_full_endpoint: "amqp://ec2-3-8-181-169.eu-west-2.compute.amazonaws.com:5672"
+rabbitmq_full_endpoint: "amqps://lkar-consulting.co.uk:5671"
 rabbitmq_username: "service"
 rabbitmq_password: "Service123Service123"
 rabbitmq_client_cert: "RABBITMQ_USER"
-rabbitmq_client_cert_file: "/opt/app-root/src/CovidCore/Deployment/certs/client.pfx"
+rabbitmq_client_cert_file: "/opt/app-root/src/Deployment/certs/client.pfx"
 rabbitmq_client_cert_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           36363263303138363030336164303663336663303737356439653033616566663133303837353430
