@@ -37,8 +37,8 @@ namespace RabbitMQWrapper.UnitTest.Factories
 
             _connectionFactoryMock.Setup(c => c.CreateConnection())
                                   .Returns(_connection.Object);
-            _certificateHelperMock.Setup(c => c.TryFindCertificate(It.IsAny<string>(), out x509Certificate2Collection))
-                                  .Returns(true);
+            _certificateHelperMock.Setup(c => c.TryFindCertificate(It.IsAny<string>()))
+                                  .Returns(new CertificateResult() { Success = true, Certificates = x509Certificate2Collection });
 
             _queueConnectionFactory = new FAC.QueueConnectionFactory(
                 _connectionFactoryMock.Object,
@@ -96,8 +96,8 @@ namespace RabbitMQWrapper.UnitTest.Factories
         {
             // setup
             _certificateHelperMock = new Mock<ICertificateHelper>();
-            _certificateHelperMock.Setup(c => c.TryFindCertificate(It.IsAny<string>(), out x509Certificate2Collection))
-                                  .Returns(false);
+            _certificateHelperMock.Setup(c => c.TryFindCertificate(It.IsAny<string>()))
+                                  .Returns(new CertificateResult() { Success = false });
 
             // test
             _queueConnectionFactory = new FAC.QueueConnectionFactory(
@@ -122,7 +122,7 @@ namespace RabbitMQWrapper.UnitTest.Factories
 
             // verify
             _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
-            _certificateHelperMock.Verify(c => c.TryFindCertificate(It.IsAny<string>(), out x509Certificate2Collection), Times.Once);
+            _certificateHelperMock.Verify(c => c.TryFindCertificate(It.IsAny<string>()), Times.Once);
 
             Assert.IsNotNull(connection);
         }

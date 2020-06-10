@@ -20,6 +20,14 @@ namespace RabbitMQWrapper.Configuration
         public string ClientCertificateSubjectName { get; set; }
 
         [DataMember(IsRequired = false)]
+        [JsonProperty("certificatePath")]
+        public string CertificatePath { get; set; }
+
+        [DataMember(IsRequired = false)]
+        [JsonProperty("certificatePassword")]
+        public string CertificatePassword { get; set; }
+
+        [DataMember(IsRequired = false)]
         [JsonProperty("temporaryQueueNamePrefix", DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue("SPC_")]
         public string TemporaryQueueNamePrefix { get; set; }

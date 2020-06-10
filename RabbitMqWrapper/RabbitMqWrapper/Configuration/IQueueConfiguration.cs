@@ -8,6 +8,8 @@ namespace RabbitMQWrapper.Configuration
         bool AutomaticRecoveryEnabled { get; set; }
         int ChannelConfirmTimeoutIntervalSeconds { get; set; }
         string ClientCertificateSubjectName { get; set; }
+        string CertificatePath { get; set; }
+        string CertificatePassword { get; set; }
         IEnumerable<ConsumerConfiguration> Consumers { get; set; }
         int ContinuationTimeoutSeconds { get; set; }
         int HandshakeContinuationTimeoutSeconds { get; set; }

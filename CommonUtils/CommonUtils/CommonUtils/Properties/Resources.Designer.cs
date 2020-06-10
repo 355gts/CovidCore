@@ -70,7 +70,7 @@ namespace CommonUtils.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find unique certificate with subject name &apos;{0}&apos;. (Found {1} certificates)..
+        ///   Looks up a localized string similar to Could not find unique certificate with subject name &apos;{0}&apos;, error details - &apos;{1}&apos;.
         /// </summary>
         internal static string CouldNotFindCertificateError {
             get {
