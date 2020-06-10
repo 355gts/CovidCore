@@ -1,5 +1,7 @@
 ---
 
+- debug:
+    msg: "{{ rabbitmq_client_cert_password }}"
 - name: Make a directory for the config 
   file:
     path: /opt/app-root/src/config
