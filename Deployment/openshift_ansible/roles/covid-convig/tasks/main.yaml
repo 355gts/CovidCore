@@ -24,6 +24,4 @@
 - name: Apply the ConfigMaps
   include: config_map.yaml config_file_path={{ item.path }}    
   with_items:
-    - "{{ appsettings_files.files }}"     
-- pause:
-    minutes: 10   
+    - "{{ appsettings_files.files }}"    

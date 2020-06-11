@@ -122,7 +122,6 @@ ClientBin/
 *~
 *.dbmdl
 *.[Pp]ublish.xml
-*.pfx
 *.publishsettings
 modulesbin/
 tempbin/
