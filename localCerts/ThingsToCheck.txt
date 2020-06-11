@@ -1,0 +1,15 @@
+1. have you got the RABBIT_CONFIG_FILE environment variable set to the path and name of your rabbitmq.conf
+
+2. Open Rabbit & view the node that is running my url is - https://localhost:15671/#/nodes/rabbit%40ISVPNKLT0000082
+Confirm that against Config file you have both the default Advanced.config & rabbitmq.conf
+
+3. Is the format of your Rabbitmq.conf correct?  I'm running version 3.8.3 of Rabbit.  In one of the prior versions they added a json format for the config file.  Also depending on the format the config file name needs to be different
+
+old format = rabbitmq.config
+new format = rabbitmq.conf
+
+I've also put my running rabbitmq.conf file in the folder for you to cross check with.
+
+4. Can you double check the URI that is set for the UserService.  I'm pretty sure I got the peer certificate issue because I'd changed to the amqps protocol but not updated the port from 5672 to 5671.
+
+Dont know if you can use them but I've put my full self signed certs in the folder too, the Password for the certs is Password1.
