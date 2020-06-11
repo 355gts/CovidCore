@@ -1,0 +1,74 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=MyTestCA
+        Validity
+            Not Before: May 14 10:26:55 2020 GMT
+            Not After : May 14 10:26:55 2021 GMT
+        Subject: CN=ISVPNKLT0000082, O=server
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:cc:d8:6e:5f:88:58:78:48:86:c3:51:77:5b:11:
+                    c2:9b:8c:ba:7f:cd:49:7f:ff:f7:1c:88:ab:0a:48:
+                    89:19:32:88:30:ba:73:e9:cf:53:22:25:bb:fa:8b:
+                    1c:ec:53:7d:e2:58:f9:cf:6b:ab:8d:45:a1:0c:6c:
+                    b6:7d:55:43:af:d1:9c:5d:b4:b9:a2:ad:12:51:3d:
+                    f3:cc:3c:07:27:1a:f0:75:2e:4e:e2:cf:eb:5d:f1:
+                    ce:65:4c:86:24:a1:a3:a5:e4:07:a5:cc:3c:e1:f6:
+                    1e:d3:9b:6c:2a:ba:80:e8:cd:ec:49:31:31:ea:3a:
+                    a6:9d:78:95:3d:50:a0:8f:d2:0d:21:91:99:05:76:
+                    63:c1:34:cf:58:21:44:30:4b:b2:de:72:04:ea:5c:
+                    2f:0b:f4:6c:23:96:ad:f0:f4:89:10:df:f9:46:8d:
+                    80:c0:e8:98:6b:c4:b3:d3:ef:2a:bb:53:98:fa:60:
+                    f1:f9:6f:03:ba:cd:e6:1d:b8:f3:c7:2e:0b:03:b7:
+                    fb:b3:e1:59:39:61:00:11:be:fc:df:40:71:93:6c:
+                    33:a8:d2:be:3e:8e:35:71:ad:bd:17:6a:02:1d:f5:
+                    73:e3:f0:be:89:bd:07:9b:48:ac:a7:6c:a7:d8:5f:
+                    b2:f9:aa:10:43:ce:94:d0:f8:4b:33:fe:20:ca:3d:
+                    4f:67
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+    Signature Algorithm: sha256WithRSAEncryption
+         9e:f1:49:74:e0:62:80:89:c5:d3:c5:00:f1:17:5f:17:c2:53:
+         1e:b0:b2:90:db:a7:61:08:f5:53:ad:be:fd:82:c2:07:32:6b:
+         98:c3:01:2c:db:61:95:08:54:d0:15:17:22:32:7b:7e:9a:e2:
+         eb:7c:31:38:fa:a0:e8:34:7e:83:d8:79:f4:68:ce:79:85:f3:
+         00:4c:bf:db:d4:50:f2:60:b2:54:9f:29:ff:5e:a1:76:ed:53:
+         71:dd:8f:1a:fc:3c:fd:68:d9:e1:a3:0a:7f:60:52:7e:25:b6:
+         73:10:e0:22:0f:be:e0:c4:b1:11:fc:2f:10:85:96:27:cd:06:
+         26:49:4c:e9:ec:f5:1a:55:c6:93:26:d3:03:55:93:c0:4d:cc:
+         1b:1c:79:97:bb:3d:99:40:eb:3a:60:a0:2b:31:4e:98:88:f0:
+         bc:b3:53:6e:b2:ab:50:10:04:28:90:15:4e:98:ae:52:3e:ba:
+         a4:9c:21:68:18:75:cd:51:bc:b3:4c:aa:c7:00:e6:ab:fa:bf:
+         7e:70:f5:34:2c:20:c8:97:aa:d8:01:98:79:ab:7e:ef:3d:31:
+         7f:55:3f:64:e3:68:2a:af:76:91:21:f5:b5:39:4a:35:50:f0:
+         f5:9d:ce:ce:41:ea:f2:5c:92:a3:34:c8:e2:86:2f:82:43:ad:
+         e7:6d:57:b0
+-----BEGIN CERTIFICATE-----
+MIIC6DCCAdCgAwIBAgIBATANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDDAhNeVRl
+c3RDQTAeFw0yMDA1MTQxMDI2NTVaFw0yMTA1MTQxMDI2NTVaMCsxGDAWBgNVBAMM
+D0lTVlBOS0xUMDAwMDA4MjEPMA0GA1UECgwGc2VydmVyMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAzNhuX4hYeEiGw1F3WxHCm4y6f81Jf//3HIirCkiJ
+GTKIMLpz6c9TIiW7+osc7FN94lj5z2urjUWhDGy2fVVDr9GcXbS5oq0SUT3zzDwH
+JxrwdS5O4s/rXfHOZUyGJKGjpeQHpcw84fYe05tsKrqA6M3sSTEx6jqmnXiVPVCg
+j9INIZGZBXZjwTTPWCFEMEuy3nIE6lwvC/RsI5at8PSJEN/5Ro2AwOiYa8Sz0+8q
+u1OY+mDx+W8Dus3mHbjzxy4LA7f7s+FZOWEAEb7830Bxk2wzqNK+Po41ca29F2oC
+HfVz4/C+ib0Hm0isp2yn2F+y+aoQQ86U0PhLM/4gyj1PZwIDAQABoy8wLTAJBgNV
+HRMEAjAAMAsGA1UdDwQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDATANBgkqhkiG
+9w0BAQsFAAOCAQEAnvFJdOBigInF08UA8RdfF8JTHrCykNunYQj1U62+/YLCBzJr
+mMMBLNthlQhU0BUXIjJ7fpri63wxOPqg6DR+g9h59GjOeYXzAEy/29RQ8mCyVJ8p
+/16hdu1Tcd2PGvw8/WjZ4aMKf2BSfiW2cxDgIg++4MSxEfwvEIWWJ80GJklM6ez1
+GlXGkybTA1WTwE3MGxx5l7s9mUDrOmCgKzFOmIjwvLNTbrKrUBAEKJAVTpiuUj66
+pJwhaBh1zVG8s0yqxwDmq/q/fnD1NCwgyJeq2AGYeat+7z0xf1U/ZONoKq92kSH1
+tTlKNVDw9Z3OzkHq8lySozTI4oYvgkOt521XsA==
+-----END CERTIFICATE-----
